@@ -1,0 +1,24 @@
+## golang实现
+
+```go
+func SelectionSort(a []int) {
+    l := len(a)
+    
+    //  i 取到倒数第二个元素就可以了，一直取到最后一个元素没意义
+    for i:=0; i<len(a)-2; i++ {
+		// 记录最小值
+        min := i
+        // 查找 后面无序序列中的最小值
+        if j:=i+1; j<len(a)-1; j++{
+            if a[min] > a[j] {
+                min = j    // 记录最小值
+            }
+        }
+        // 不是自身的进行交换
+        if i != min {
+                    a[i] , a[min] = a[min] , a[i]
+        }
+    }
+}
+```
+
