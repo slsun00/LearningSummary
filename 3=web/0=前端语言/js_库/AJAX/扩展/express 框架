@@ -1,0 +1,49 @@
+## 设置
+
+```js
+
+// 引入框架  
+const express = require('express');
+
+// 创建应用对象,web 服务端
+const app = express();
+
+// 路由创建
+
+// request 是对请求报文的封装
+// response 是对响应报文的封装
+app.get("/server", (request, response) => {
+    // 设置响应头 , 设置需要跨域
+    response.setHeader('Access-Controll-Allow-Origin', '*');
+    // 设置响应
+    response.send('hello ajax');
+});
+
+
+app.post("/server", (request, response) => {
+    // 设置响应头 , 设置需要跨域
+    response.setHeader('Access-Controll-Allow-Origin', '*');
+    // 设置响应
+    response.send('hello ajax');
+});
+
+// 这个是处理 header 中含有未定义的类型 ，可以接收任意类型的请求
+app.all("/server", (request, response) => {
+    // 设置响应头 , 设置需要跨域
+    response.setHeader('Access-Controll-Allow-Origin', '*');
+    response.setHeader('Access-Controll-Allow-Headers', '*');
+
+    // 设置响应
+    response.send('hello ajax');
+});
+
+
+// 延时设置
+
+
+// 监听端口
+app.listen(8000, () => {
+    console.log("服务启动，8000 端口监听")
+})
+```
+
