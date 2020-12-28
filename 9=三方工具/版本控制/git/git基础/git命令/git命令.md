@@ -549,8 +549,6 @@ push不光可以推送到远程已经存在的分支，也可以推送到不存�
         $ git push –all hellobare2.git
 
         用 git log 命令查看 hellobare2.git 库，它的历史记录和版本库 hello 也是一样的。
-
-
 ```
 
 

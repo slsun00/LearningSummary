@@ -1,3 +1,41 @@
+## ajax API
+
+### 文档
+
+```css
+XMLRequest()		创建 XHR 对象
+status				响应状态码
+statusText			响应状态文本
+	200 ok  404 not found
+readyState			表示请求状态的只读属性
+	0 初始
+	1 open()之后
+	2 send()之后
+	3 请求中
+	4 请求完成
+onreadystatechange	绑定 readystate 改变的监听 ，监视的回调函数
+responsetype	指定响应数据类型，
+	若是 json 得到相应后，自动解析响应
+response	响应体数据，类型取决于 responseType
+timeout		指定请求超时时间，默认 0 表示没有限制
+ontimeout	绑定超时的监听
+onerror		绑定请求网络错误的监听
+open()		初始化一个请求 ， 参数为 (method,url[,async])
+send(data)	发送请求
+abord()		中断请求
+getResponseHeader(name)		获取指定名称的响应头
+getAllResponseHeaders()		获取所有响应头组成的字符串
+setRequestheader(name,value)  设置请求头
+```
+
+
+
+
+
+
+
+
+
 ## 客户端
 
 ### 0.实现步骤
@@ -61,7 +99,7 @@ xhr.getAllResponseHeaders() // 所有响应头
 xhr.response   // 响应体
 ```
 
-#### 多JAXA任务
+#### 多 ajax任务
 
 ```js
 // 网站上存在多个 ajax 任务 ，就应该为 XMLHttpRequest 对象编写一个标准函数
@@ -291,38 +329,6 @@ btns[0].onclick = function(){
     
 }
 ```
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
