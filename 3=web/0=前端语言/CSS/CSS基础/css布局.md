@@ -707,6 +707,21 @@ css 提供了 3 种传统布局方式，即 3 中摆放顺序
 	多个块级元素 ： 纵向排列找标准流 ， 横向排列找浮动
 ```
 
+### 移动端布局
+
+```css
+/*参看移动端布局*/
+单独制作移动端页面
+    流式布局（百分比布局）
+    flex 弹性布局(推荐)
+    less + rem + 媒体查询布局
+    混合布局
+
+ 响应式布局
+    媒体查询
+    bootstarp
+```
+
 
 
 ### 盒子水平布局
@@ -822,10 +837,10 @@ margin
 /*以前默认*/
 	border-box: concent-box 盒子大小为 width + padding + border 
 /*新的*/
-	border-box: concent-box 盒子大小为 width
+	border-box: border-box 盒子大小为 width ，从边框开始算的
 
 新盒子模型语法
-	选择器 { box-sizing:border-box; }
+	选择器 { box-sizing:border-box; }  开启新的盒子模型
 	padding 和 border 不会撑大盒子，前提是padding 和 border 不会超过 width 宽度
 	
 ```

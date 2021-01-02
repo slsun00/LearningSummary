@@ -181,7 +181,9 @@ transition
 	谁过渡，给谁设置属性
 ```
 
-## 2D 转换
+## 转换
+
+### 2D 转换
 
 ```css
 2D  二维坐标系
@@ -196,9 +198,10 @@ transition
 
 转换 transform 可以理解为变形
 	{
-    	transform: translate();   移动
+    	transform: translate();    移动
         transform: retate();		旋转
         transform: scale();  		缩放
+        transfor-origin:x y;	元素转换中心点
 	}
 
 移动	translate
@@ -210,15 +213,116 @@ transition
 		3. 百分比单位是相对于自身元素的 translate:(50%,50%)
 		4. 对行内标签没有效果
 
-旋转
+旋转 rotate
 	旋转的度数的单位是 deg , 比如旋转45度 rotate(45deg)
-	旋转的中心是 元素的中心点(50% , 50%)
 	正值 ：顺时针 ， 负值 ： 逆时针
-	还可以给 x y  设置像素、方位名词 (top bottom left right center)
 
-缩放
+
+缩放 scale
 	给元素控制放大或者缩小
 	scale(x,y)  x对长 y对宽 进行缩放
 	在放大的同时，不会影响其他盒子，还可以设置缩放中心点
+
+转换中心点 trabsform-origin
+	其后面的参数 x y 用空格隔开
+	x y 默认的转换中心点是元素的中心点 (50% 50%)
+	还可以给 x y  设置像素、方位名词 (top bottom left right center)
+
+顺序(一块使用的顺序)
+	transform:translate() rotate() scale()
+	顺序会影响转换效果 先旋转会改变坐标轴的方向
+	先移动 ，后再做其他的属性
+	
 ```
+
+### 3D转换
+
+#### 三位坐标
+
+```css
+x 轴 ： 水平向右 ， x 右边是正值， 左边是负值
+y 轴 ： 垂直向下 ， y 下面是正值， 上面是负值
+z 轴 ： 垂直屏幕 ， 往外是正值， 往里是负值
+```
+
+#### 转换
+
+```css
+位移	translatle3d(x,y,z)
+	只是比3d多了一个z轴 ，通常单位是 px
+	translate-z 和 eprspective 效果一样，只是 translate-z 是直接写到要改动的元素上
+旋转	rotate3d(x,y,z)
+	旋转角度是有正负的，要注意
+	遵循左手规则：大拇指指向轴正方向，左手弯曲起来的方向就是正方向
+	transform:rotate3d(1,1,0) --->  围绕着y=x这条线旋转
+透视	perspective
+	让网页产生 3d 效果，可理解成 3d 投影在 2d 平面内
+	模拟人类的视觉位置，可认为安排一直眼睛去看 
+	透视可以成为视距：视距就是人的眼睛距离屏幕的距离
+	距离视距点越近的电脑平面成像越大，越远成像越小
+	单位
+		像素
+	要求
+		透视写在被观察元素的父盒子上面的
+		d : 视距，一个距离人的眼睛到屏幕的距离 
+		z ：z 轴，物体距离屏幕的距离， z 轴越大(正值)我们看到的物体越大
+呈现	transform-style
+	控制三维立体环境，代码是写给父级，但是影响的是子盒子
+	transform-style:flat;	默认不开启 3d 空间
+	transform-style:preserve-3d;	子元素开启立体空间
+```
+
+## 动画 
+
+*   介绍
+
+    ```css
+    介绍
+    	通过设置多个节点来精确控制一个或者多个节点来精确控制一个或者一组动画，来实现复杂的动画效果
+    使用
+    	定义动画
+    	使用动画
+    定义动画
+    1. keyframes 定义动画(类似定类选择器)
+    @keyframes 动画名称 {
+        0% {
+            width：100px;
+        }
+        100% {
+            width:200px;
+        }
+    }
+    注意
+    	动画序列 ： 通过 百分比来控制动画的进度，进行了多少， 对时间进行了划分
+    		0% 是动画开始 就是 from 
+    		20% 
+    		100% 就是动画结束 ，就是 to
+    
+    2. 调用
+    div {
+        animation-name:动画名称； /*调用动画*/
+        animation-duration:持续时间；  /*动画持续时间*/
+    }
+    
+    /* 简写 */
+    animation : 动画名称 持续时间 运动曲线 何时开始 播放次数 是否反方向 动画起始或者结束状态
+    简写里面没有 animation-play-station  ，这个需要单独设置
+    ```
+
+## 浏览器私有前缀
+
+```css
+为了兼容老版本的浏览器，比较新的浏览器不用
+1. 私有前缀
+	-moz-	火狐
+	-ms-	ie
+	-webkit-	safari chrome
+	-o-		opera
+2. 提倡写法
+	先写浏览器前后最，最后写非私有的
+	-moz-border-radius:10px;
+	border-radius:10px;
+```
+
+
 
