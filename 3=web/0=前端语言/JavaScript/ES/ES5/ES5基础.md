@@ -28,12 +28,6 @@
         }
         ```
 
-*   语法和行为改变
-
-    *   必须使用 var 声明变量
-    *   进制自定义函数中的 this 指向 window
-    *   创建 eval 作用域 ，不会影响全局变量
-    *   对象不能有重名的情况
 
 
 
@@ -78,8 +72,22 @@ delete obj1.name
 ----------------------------------------------------------------------------------------------
 ----------------------------------------------------------------------------------------------
 
-Object.defineProperties(object,description)
-	作用 ： 为指定对象定义扩展多个属性
+Object.defineProperties(object,prop,description)
+参数
+	ogject : 要修改的对象
+    prop	： 属性
+    description ：描述 ，以对象形式书写 {}
+		value : 设置属性的值 ，默认为 undefined
+		writable : 值是否可以重写 。默认为 false
+		enumerable : 目标对象是否可以被枚举 ，默认为 false 
+		configurable : 目标属性是否可以被删除或者是否再次修改特性 ，默认为fasle
+// 给 object 添加属性 num = 1000
+    object.defindeProperty(obj,'num',{
+        value:1000
+    });
+
+    	
+作用 ： 为指定对象定义扩展多个属性
      get    用来获取当前属性值的回调函数
      set    修改当前属性值触发的回调函数，并且实参即为修改后的值
      存取器属性
@@ -113,20 +121,32 @@ console.log(obj2.fullName)   // lihua
 
 
 
-## 数组扩展
+## 数组新增
+
+### 迭代
 
 ```js
-// 得到数组中的第一个下标
-Array.prototype.indexof(value)
-// 得到数组中的最后一个下标
-Array.prototype.lastIndexof(value)
-// 遍历数组
-Array.prototype.forEach(function(item,index){})
-// 遍历数组返回一个新的数组，返回加工后的值
-Array.prototype.map(function(item,index){})
-// 遍历过滤一个新的子数组 ，返回条件为 true 的值
-Array.prototype.filter(function(item,index){})
+迭代遍历方法 ：foreach() , map()  filter() some()  every()
 
+foreach()
+	Array.prototype.forEach(function(item,index,array){})
+		array 数组本身，可以省略不写
+        forEach 中的 return 不起作用！！！！
+filter()
+	// 遍历过滤一个新的子数组 ，返回条件为 true 的值 , 用于条件筛选，查所有满足条件的值
+	Array.prototype.filter(function(item,index,array){})
+	遇到 return 不会终止迭代
+map()
+	// 遍历数组返回一个新的数组，返回加工后的值
+	Array.prototype.map(function(item,index){})
+some()
+	// 碰到第一个满足条件的，返回true , 否则返回 false
+	// 碰到 return  true 就返回
+	Array.
+    
+    
+    
+----------------------------------------------
 
 var arr = [2,3,4,2,5]
 arr.indexof(2) 		//0
@@ -145,6 +165,20 @@ arr.filter(function(item,index){
     return item > 3 ;
 })
 ```
+
+### 下标
+
+```js
+
+// 得到数组中的第一个下标
+Array.prototype.indexof(value)
+// 得到数组中的最后一个下标
+Array.prototype.lastIndexof(value)
+// 遍历数组
+
+```
+
+
 
 ## 函数扩展
 

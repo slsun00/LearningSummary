@@ -4,11 +4,13 @@
 
 ```js
 作用
-	声明一个变量 ，和 var 相似
+	声明一个变量 ，和 var 相似。var没有块级作用域
+    let 关键
 特点
-	在扩作用于内有效
+	声明的变量具有块级作用域，只在块作用于内有效 ，即一对{}内
     不能重复声明
     不会预处理(提升)，不存在提升
+    防止循环变量变成全局变量
 应用
 	循环遍历加监听
     使用 let 取代 var 是趋势
@@ -41,6 +43,7 @@ let a = 123
 ```js
 解构
 	从对象或数组中提取数据，并赋值给变量(多个)
+	允许我们按照一一对应的关系从数组中提取值，然后将值赋值给变量
 对象
 	let {n,a} = {n:'tom',a:12}
 数组
@@ -63,7 +66,26 @@ let a = 123
         let str = `我的名字叫：${obj.name} ， 年龄是：${obj.age}`
     ```
 
+
+
 ## 对象
+
+### 介绍
+
+```css
+对象
+	一组无序的相关属性和方法的集合，所有的事务都是对象：字符串、函数等鞥
+	属性 ： 事务的特征 ，名词表示
+	方法 ： 事物的行为 ， 动词表示
+```
+
+### 注意
+
+```css
+es6 中没有变量提升，所以必须要先定义类 ， 才能通过类来实例化对象
+```
+
+
 
 ### 简化写法
 
@@ -92,23 +114,190 @@ let obj {
 }
 ```
 
-### 面向对象
+## 类 class
+
+### 介绍
+
+*   es6 中新增了类的概念
+*   类抽象了对象的公共部分，泛指某一大类
+*   对象特指某一个，是通过类实例化一个具体的对象
+*   继承
+
+### 使用
 
 ```js
+语法
+	class name {// class body }
+创建实例
+	let xx = new name();
+类构造函数
+	class Star {
+        constructor(uname) {
+            this.uname = uname
+        }
+    }
+	let a = new star("刘德华")  // 自动创建一个刘德华的实例
+// 使用
+ 	class 声明
+        关键字创建类，类名习惯首字母大写
+    constructor() 构造函数
+		是类的构造方法(默认) ， 用于传递参数，返回累的实例对象
+	    new 生成对象实例会自动调用该方法 ，如果不写这个函数，类内部会自动给我们创建一个 constructor()
+	new 
+    		1. 类必须使用 new 实例化对象
+	规范
+    	类名后面不要加小括号
+        生成实例，类名后面加小括号，构造函数不需要加 function
 
+// 添加方法
+	方法直接写到 class body 中即可，不需要加 function ,多个 方法之间不需要添加逗号分隔
+    添加
+        class star {
+            sing(song){console.log(song)}
+            dance(){}
+         }
+	调用
+    	let a = new Star("刘德华")  // 自动创建一个刘德华的实例,前面有的代码就不写了
+       a.sing("冰雨")
+        
+
+注意
+
+	2. 类的方法会自动加到原型里面，构造函数要自己在原型里面追加公共方法
 ```
+
+### this 指向问题
+
+```js
+// 类里面 的共有属性和方法一定要加 this
+	1. constructor 里面的this指向的是创建的对象
+     2. 方法里面的 this 指向这个方法的调用者
+
+class Star {
+    constructor(name) {
+        // constructor 里面的this指向的是创建的对象
+        this.name = name;   
+    }
+    
+    sing(song) {
+        this.song = song;
+    }
+}
+```
+
+
+
+### 本质
+
+```js
+class 本质
+    还是函数，可以简单理解为 类是构造函数的另一种写法
+    具有和构造函数一样的特点
+    
+特点(就是：构造函数特点)
+	1. 类有原型对象 prototype 
+    2. 类原型对象 prototype 里面有 constructor 指向类本身
+    3. 类可以通过原型对象添加方法
+    4. 类创建的实例对象有 __proto__ 原型，指向类的原型对象 
+    
+注意
+	es6 的绝大部分功能，es5都可以做到，新的类写法让对象原型写法更加清晰、更像面向对象
+    es6 中 类是语法糖
+```
+
+
+
+
+
+
+
+
+
+
 
 
 
 ## 函数
 
-### 匿名函数
+### 构造函数
+
+*   介绍
+
+    ```js
+    *   是一个特殊函数，
+    *   用来初始化对象，即为对象成员变量赋初始化值，它总与 new 一起使用
+    *   我们可以把对象中一些公共的属性和方法抽取出来，然后封装到这个函数中
+    
+    成员
+    	构造函数中的属性和方法，我们称为成员
+        成员可以添加
+    实例成员
+    	构造函数内部通过 this 添加成员
+        实例成员只能通过实例化的对象来访问
+        
+        function Star(name) {
+            this.name = name;	// 实例成员 name sing
+            this.sing = function() {
+                console.log("唱歌")
+            }
+        }
+    
+    静态成员
+    	在构造函数本身上添加的成员
+        静态成员只能通过构造函数进行访问
+       	例子
+        	Star.sex = "女"   // 静态成员
+    		但是不能是
+            	let ldh = new Star("刘德华")
+                ldh.sex = "男"  // 不可以这样使用实例对象进行访问
+    
+    对象成员查找规则(原型链的规则)
+    1. 当访问一个对象的属性(包括方法)时，首先查找这个对象有没有该属性
+    	 找到 ：使用
+    	 找不到 ： 查找他的原型(即：__proto__ 指向的 prototype 对象)
+    		 找不到 ：就找原型对象的原型(object原型对象)
+    	一次类推，直到找到 Object 为止
+    
+    ```
+
+*   new
+
+    ```js
+    new 在执行的时候，会做 4 件事
+    1.  在内存中创建一个新的空对象
+    2.  让 this 指向这个新的对象
+    3. 执行构造函数里面的代码，给这个新对象添加属性和方法
+    4. 返回这个新的对象(所以构造函数不需要 return)
+    ```
+
+*   缺点
+
+    ```js
+    问题
+    	构造函数虽好，但是存在 内存浪费的问题
+    解决
+    	希望所有对象使用同一个函数，这样可以节省内存
+         一般情况下，公共属性定义到构造函数里面，公共的方法我们放在原型对象身上
+    ```
+
+*   特点综述
+
+    ```js
+    1. 构造函数有原型对象 prototype 
+    2. 构造函数原型对象 prototype 里面有 constructor 指向构造函数本身
+    3. 构造函数可以通过原型对象添加方法
+    4. 构造函数创建的实例对象有 __proto__ 原型，指向函数的构造函数 
+    ```
+
+    
+
+### 箭头函数
 
 ```js
-箭头函数
 作用
 	定义匿名函数
 语法
+	(参数) => {函数体}；
 	let 函数名 = (参数) => {函数体}；
 特点
 	1. 语法间接
@@ -137,8 +326,7 @@ let obj {
 		let fun = (x,y) => x + y;
 		let fun = (x,y) => {return x + y;}
         
-        
-     	
+      	
 ```
 
 
@@ -183,6 +371,222 @@ let Point = new Point()	    // 这里 x 就是 1， y 就是 2
 ```
 
 
+
+## 原型
+
+### 构造函数原型对象 prototype
+
+```js
+原型
+	一个对象，也称 prototype 对象为原型对象
+    这个对象所有属性和方法，都会被构造函数所拥有
+    js 规定每一个构造函数都会有一个 prototype 属性 ，指向另一个对象
+作用
+	共享方法
+	构造函数通过原型分配的函数时所有的对象所共享的
+
+
+使用
+	把不变的方法，直接定义到 prototype 对象上，这样所有对象的实例就可以共享这些方法
+	Star.prototype.sing = function() {
+        console.log("冰雨")
+    }
+```
+
+### 对象原型 `__proto__`
+
+```js
+对象都会有一个属性 __proto__ 
+	指向构造函数的 prototype 原型对象，
+    之所以能使用构造函数的 Prototype ，就是因为对象有 __proto__ 原型的存在
+注意
+	__proto__ 对象原型和原型对象 prototype 是等价的
+    
+意义
+	在于为对象的查找机制提供一个方向，或者一条路线
+    是一个非标准属性 ，实例开发中可以不用，他只是内部指向原型对象 prototype
+
+    
+查找规则(原型链)
+	向看对象深深是否有需要的查找的方法
+    	有 ：就执行对象身上自带的方法
+        没有 ： 应为有 __proto__ 存在，就去构造函数原型对象 prototype 身上查找
+```
+
+
+
+### 原型构造属性
+
+```js
+对象原型( __proto__ ) 和构造函数 (prototype) 原型对象都有一个 constructor 属性
+constructor 属性 ：
+	构造函数，指向构造函数本身
+    用途	
+    	用于记录该对象引用哪个构造函数，他可以让原型对象重新指向原来的构造函数
+    	如果使用我们修改了原来的原型对象，给原型对象赋值的是一个对象，则必须手动利用 constructor 指回原来的构造函数(相当于修改原型对象)
+```
+
+### 原型链
+
+### 原型对象 this 指向
+
+```js
+介绍
+	构造函数中，里面this指向的是对象实例
+    原型对象函数里面的this指向的是实例对象
+```
+
+### 原型扩展内置对象
+
+```js
+使用
+	通过原型对象 ，对原来内置对象进行扩展自定义的方法
+ 例子
+1. 给数组自定义求偶数的功能
+	Array.prototype.sum = function() {
+        let sum = 0;
+        for (let i=0;i<this.length;i++) {
+            sum += this[i];
+        }
+        return sum;
+    }    
+	// d调用
+	let arr = [1, 2, 3]
+    console.log(arr.sum())
+
+	// 注意: 这样子是用一个新的对象覆盖原来的原型对象
+    Array.prototype = {
+          sum = function() {
+          }
+   	 }    
+```
+
+
+
+## 继承
+
+### 介绍
+
+```js
+es6 之前没有 extends 继承 ， 使用 构造函数 + 原型对象实现继承，被称为 组合继承
+es6 用过类实现继承
+```
+
+### 类继承
+
+#### 使用
+
+```js
+class FAther {
+    constructor(){}
+    money(){console.log(100)}
+}
+class Son extends Father {
+    constructor(){}
+}
+// Son 就继承了 Father 的属性和方法
+let son = new Son()
+son.money()
+```
+
+#### super 关键字
+
+```js
+// super 关键字
+用途 ： 子类通过该关键字把数据传给父类，就可以完美调用父类的方法
+	调用父类的构造函数
+    调用父类的普通函数
+原因 ： (父类方法中的 this 是指向父类的)
+注意 ：super 必须放到 子类的 this 之前
+// 构造函数不能继承，所以要使用 super 关键字进行调用
+
+class FAther {
+    constructor(){}
+    money(){console.log(100)}
+}
+class Son extends Father {
+    constructor () {
+        super();	// 调用父类中的构造函数
+    }
+    say() {
+        super.say();	// 调用父类的普通方法
+    }
+}
+
+// 继承中属性、方法查找原则：就近原则
+1.先看子类中有没有这个方法(就近原则)
+	有 ：就先执行子类方法
+    没有 ：就去父类中照这个方法
+    
+2. supper 关键字必须在子类 this 之前
+class Son extends Father {
+    constructor(x,y) {
+        super(x,y)
+        this.x = x
+        this.y = y
+    }
+}
+
+```
+
+### es5 组合继承
+
+#### 父构造函数继承属性
+
+```js
+// call() 函数
+    function fnName() {
+        console.log('123')
+    }
+
+    fnName.call()	// 调用函数 
+    var o = {
+        name:'andy'
+    }
+    fnName.call(o) // 第一个参数，就是call调用的函数的 this 指向
+
+// 父构造函数
+function Father(name) {
+    // this 指向父构造函数的对象实例
+    this.name = name;
+}
+
+// 子构造函数
+function Son(name，age) {
+     // this 指向子构造函数的对象实例   
+    Father.call(this,name)  // 改变函数的 this 指向， 这里使父函数的 this 指向变为 Son ， 实现继承
+    this.age = age
+}
+
+let son = new Son('刘德华',18)
+
+```
+
+#### 原型对象实现继承
+
+```js
+// 父构造函数
+function Father(name) {
+    // this 指向父构造函数的对象实例
+    this.name = name;
+}
+
+Father.prototype.money = function(){
+    console.log("1000")
+}
+// 子构造函数
+function Son() {
+}
+
+// Son.prototype = Father.prototype;
+// 上面这样赋值，如果修改子原型对象。父原型对象也会跟着变化
+Son.prototype = new Father();
+// 如果利用对象的形式修改了原型对象，最后要用 constructor 指回原来的构造函数
+Son.prototype.constructor = Son;
+
+let son = new Son();
+console.log(son.money())
+```
 
 
 
