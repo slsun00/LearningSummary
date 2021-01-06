@@ -270,11 +270,12 @@ v-model 其实是一个语法糖，本质有两个操作
 
 *   组件化开发（参看组件、模块化开发）
 *   vue 组件必须在 Vue 实例中使用
+*   注意大小写的问题 ，在使用脚手架的时候，没有这个大小写的问题（原生的vue是有大小写问题的）
 
-### 原理
+### 使用
 
 ```js
-原理
+完整流程
 	1. 创建组件构造器		Vue.extend()	// 返回组件对象
     2. 注册组件			  Vue.component()   .组件构造器的对象一般都写到这里面了
     3. 使用组件			  Vue 实例作用范围使用组件 <><>
@@ -283,13 +284,39 @@ v-model 其实是一个语法糖，本质有两个操作
 	Vue 简化了过程，省去使用 Vue.extend() 的步骤 ，直接使用一个对象替代
     直接写在注册组件当中了，即 Vue.conponent('',{}) 
 
+属性
+	template
+		就是要复用的模板
+	data
+		存放数据，但是必须是函数
+	methods
+    props
+    	properties（属性），子组件从父组件接收的数据 ，类型为数组、字符串
+        在组件上注册的一些自定义 attribute。
+        当一个值传递给一个 prop attribute 的时候，它就变成了那个组件实例的一个 property
+        props 验证可以自定义类型
+    
+    
+注意
+	组件只能有一个根元素
+    html 大小写不敏感，所以你使用驼峰命名，在标签中需要用 - 连接
 ```
 
-### 属性
+### 原理
+
+*   data 函数
 
 ```js
-template
-	就是要复用的模板
+data:function(){
+    return {
+        title:'abc'   // 这个就是组件用到的数据 ，在{{}} 中使用的
+    }
+}
+
+原因：
+	块级作用域
+	组件每次调用 data 会创建一个新的对象，标签数据之间不相互影响，因为各自都有一个新的对象
+    减少连续影响
 ```
 
 
@@ -316,7 +343,10 @@ template
 
     ```js
     一个组件里面包含了另一个组件 ，就是父子组件 ， 
-    	外层的是 父组件 ， 里层的是子组件
+        父组件 {
+        	子组件
+    	}	
+    
     原始的
     	// cpn2 本身就是一个组件，里面嵌套了另一个组件 component cpn1
     	const cnp2 = Vue.extend({
@@ -372,17 +402,104 @@ template
     Vue.component('hello-world', {
       template: 'id的值'
     })
-    
-    
     ```
-
+    
 *   .vue 文件
 
     ```js
     
     ```
 
-### 组件访问vue实例数据
+### 组件数据访问
+
+#### 组件访问vue实例数据
+
+```js
+1. 组件可以直接访问 Vue 实例中的 data,但是不建议，这样会使 Vue 实例变得很臃肿
+2. Vue 组件应该有自己保存数据的地方 ，其有 data 
+```
+
+#### 父传子 -props
+
+```js
+使用
+	// 后端 --》 父组件 --》 子组件
+	父组件从服务端获取到数据，然后给子组件进行展示
+实例
+	父组件
+    // Vue 是根组件
+    	const app = new Vue({
+            el:'#app',
+            data: {
+                movie: ['','','']
+            },
+            components: {
+                cpn
+            }
+        })
+	子组件
+    	const cpn = {
+            
+             // 这里就是子组件中对应 的接收父组件数据的变量
+            template:'
+            	<div> {{cmovie}} </div> 
+            		',
+            props:['cmovie']	// 引用的变量名。类型可以看 prop 验证，数组+对象
+        }
+    使用的时候传数据
+    	<div id="app" >
+            // 注意下面v-bind 的键值对都来自谁 ： (:子组件:父组件）
+            // 这里相当于 子组件和父组件结合起来了
+        	<cpn :cmovie="movie"></cpn>
+        </div>
+```
+
+#### 子传父 - 自定义事件
+
+```js
+使用
+	// 用户输入 --》 子组件 --》 父组件
+	用户浏览器输入产生事件  --  子组件产生事件 --》 通知父组件
+实例
+	父组件
+    // Vue 是根组件
+    	const app = new Vue({
+            el:'#app',
+            components: {
+                cpn
+            },
+            methods: {
+                // 用来处理子组件中的事件 ，并接收传过来的数据，dom 中省略参数情况见下面
+                cpnClick(item) {
+                    console.log('cpnClick')
+                }
+            }
+        })
+	子组件
+    	const cpn = {
+            // 子组件的模板
+            template:'<div> 
+            			<button @click="btnclick(item)"></button>
+            		</div>',
+            methods: {
+            	btnclick(item){
+                    // 告诉父组件发生的事件，并封装起了个名字,并把数据 item 传递过去
+                    this.$emit('itemclick',item)                    
+                }
+        	},
+            props:['cmovie']	// 引用的变量名。类型可以看 prop 验证，数组+对象
+        }
+        
+    使用的时候传数据
+    	<div id="app" >
+        // 注意下面v-on的键值对都来自谁 ： @子组件事件名：父组件对应的处理方法
+        // 这里相当于 子组件和父组件结合起来了
+        // 注意自定义事件执行的时候，不写实参的默认陈晓娜书是自定义事件传过去的值，不是浏览器产生的事件！
+        	<cpn @item-click="cpnClick"></cpn>
+        </div>
+```
+
+
 
 
 
