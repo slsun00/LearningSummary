@@ -113,7 +113,16 @@ vue 实例
 
 ## vue 实例
 
-### 声明周期
+### 生命周期
+
+```js
+const app = new Vue({
+    el:'#app',
+    data:{}
+})
+```
+
+![image-20210107134720243](image-20210107134720243.png)
 
 
 
@@ -412,6 +421,14 @@ data:function(){
 
 ### 组件数据访问
 
+#### 注意
+
+```js
+根据数据流的特点，谁的数据谁去修改
+```
+
+
+
 #### 组件访问vue实例数据
 
 ```js
@@ -450,6 +467,7 @@ data:function(){
     	<div id="app" >
             // 注意下面v-bind 的键值对都来自谁 ： (:子组件:父组件）
             // 这里相当于 子组件和父组件结合起来了
+            // 这里双引号里面默认是一个变量，而不是字符串
         	<cpn :cmovie="movie"></cpn>
         </div>
 ```
@@ -500,6 +518,170 @@ data:function(){
 ```
 
 
+
+#### 父子双向
+
+```js
+// 子组件改变数据，发送给父组件，然后父组件再改变 props 数据
+
+const app = new Vue({
+    el:'#app',
+    data: {
+        num1:1
+    },
+    methods:{
+      // 注意这个 value 是字符串
+      num1change(value)  {}
+    },
+    components:{
+   		cpn: {
+    		template:'#cpn',
+    		props: {
+    			number1:number
+			}，
+             // 根据 props 初始化 data 中的dnumber1
+             // 不推荐直接更改 props 中的值，而是通过 data 计算属性来更改
+             data() {
+             	return  {
+                   dnumber1:this.number1
+                }   
+             },
+             methods: {
+                 numInput(event){
+                     return {
+                         // v-model 语法糖岔开了，顺便触发input事件的时候向父组件发送个自定义事件
+                         this.dnumber1 = $event.target.value
+                         this.$emit('num1change',this.dnumber1)
+                     }
+                 }
+             }                
+            }
+        }
+    })
+
+// 子组件模板
+<template id="cpn">
+    // 注意这里绑定到 props 中了
+    // <input v-model="number1">
+    // <input type="text" :value="dnumber1" @input="dnumber1=$event.target.value">
+    <input type="text" :value="dnumber1" @input="numInput">
+</cpn>
+//父组件使用
+<div id="app">
+    <cpn :number1="num1" @num1change="num1change"></cpn>
+</div>
+```
+
+
+
+## 插槽
+
+### 组件插槽
+
+```js
+1. 组件的插槽也是为了让我们封装的组件更加具有扩展性
+2. 让使用者决定组件内部的一些内容到底展示什么
+3. 有些组件之间有相同性，但是没有必要再封装层一个组件，所以就使用插槽
+4. 插槽封装 ： 抽取共性，保留不同
+	将共性抽取到组件中，不相同的暴露为插槽。因为预留的插槽，使用者可以自行决定者部分内容展示什么
+    
+ 思考
+ 	就是在组件中用插槽预留一个位置 slot，在多次使用组件的时候，每次中的 slot 位置，可以是手动设置不同的东西
+    <template id="app"> 
+        <h2></h2>
+        <slot></slot>
+    <template>
+        
+    // 使
+        用 ,重复使用组件，其中改变不同的部分
+    <cpn><slot>111</slot></cpn>
+    <cpn><slot>222</slot></cpn>
+默认值
+	插槽中可以设置一些标签，充当默认值
+    
+        
+```
+
+
+
+### 具名插槽
+
+```js
+// 有具体名称的插槽
+
+<div id='app'>
+    // 这个是替换的是没有 name 的slot
+    <cpn>123</cpn>
+	// 这个是替换的指定的插槽 slot
+    <cpn><span slot="left">23</span></cpn>
+</div>
+
+<template>
+	<div>
+        <slot></slot>
+        <slot name="left"><span>左</left></slot>
+        <slot name="right"><span>左</left></slot>
+     </div>
+</template>
+```
+
+### 编译作用域
+
+```js
+<div id="app">
+    // 此处 v-show 是vue实例的变量
+    <cpn v-show="isshow"></cpn>
+</div>
+<template>
+    // 模板的变量是从组件当中找的，作用域只在子组件
+    <button v-show="ishow"></button>
+</template>
+```
+
+### 作用域插槽
+
+```js
+// 父组件替换插槽的标签，但是内容由子组件来提供
+// 作用插槽允许你将模板传递给插槽，而不是传递一个已呈现的元素。它被称为作用域的插槽，
+// 因为尽管模板在父范围内呈现，但它可以访问某些子数据。
+
+
+<div id="app">
+    <cpn >
+    // 获取子组件中的 languages （注意其作用域是子组件）, 拿到子组件中的 data
+    // 通过 slot1 引用插槽对象，
+    	<template slot-scope="slot1">
+            // 注意 slot1 和 data 是怎么来的
+            <span v-for="item in slot1.data">{{item}}</span>
+	    </template>
+    
+    </cpn>
+</div>
+
+<template>
+    <div>
+    	// <ul><li v-for="item in languages"></li></ul>
+    	// data 是随意起的 ，主要是拿到变量 lanbguages, 即 data 指向 languages
+    	<slot ：data="languages">
+    		<ul><li v-for="item in languages"></li></ul>
+    	</slot>
+    </div>
+</template>
+
+
+const app = new Vue({
+    el: '#app',
+    components: {
+        cpn : {
+        	data() {
+           		 return {
+                	 languages:[]
+            	}
+        	}   
+        }
+    }
+})
+```
 
 
 
