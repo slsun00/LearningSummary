@@ -115,68 +115,6 @@ for (var i=0;i<str.lenth;i++){
 
 ### 字符串属性
 
-```js
-length 				返回字符串长度
-constructor			 返回创建字符串属性的函数
-prototype			允许向对象添加属性和方法
-
-var test = "fsf"
-console.log(test.length)  // 3
-```
-
 ### 字符串方法
 
-```js
-// 参看字符串函数
-```
-
 ## 转换为 string
-
-*   toString() 方法
-
-    ```js
-    调用被转换数据类型的 toString（） 方法，不会改变原变量，返回转换的结果
-    
-    var a = 123;
-    var b = a.toString()
-    // a = a.toString()
-    
-    // 注意
-    	1. null 和 undifined 没有 toString 方法，使用会抛错
-    ```
-    
-    
-    
-*   String() 函数
-
-    ```js
-    // 可以将任意类型的值转化为 字符串
-    1. 原始类型值
-    	数值、boolean、undefined、null
-    	但会的是原值 + 加上双引号
-    
-    
-    2. 对象
-    	对象 ：一个类型字符串    string({a:1})	 	 // "[object bject]"
-        数组 ：该数组的字符串形式	string([1,2,3])      // "1,2,3"
-    
-    
-    转换规则
-    	对于 Number Boolean  调用 toString 方法
-         对于 undefined null、对象 ， 调用 valueOf 方法输出
-    
-                                       
-    String({a:1})   // "[object bject]"
-    String({a:1}.toString())
-    ```
-    
-*   '+' 号
-
-    ```js
-    任意变量 + 字符串 = 字符串的拼接
-    
-    任意量 + ""（空字符串）   进行转换
-    ```
-
-    
-
