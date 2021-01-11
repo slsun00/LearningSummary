@@ -85,6 +85,31 @@ promise.prototype.finallly(onFinally)
 
 ## 使用
 
+### 介绍
+
+```js
+1. 异步编程的一种解决方案
+2. 我们封装一个网络请求的函数，因为不能立即拿到结果，所以需要传入另一个函数，在数据请求成功的时候，将数据通过传入的函数回调出去
+3. 当网络请求非常复杂的时候，就会出现回调地狱 
+
+// 链式编程
+套娃边串娃
+// 使用
+	有异步操作的时候，使用 promise 封装
+    
+    
+promise.then(函数1 ， 函数2)
+	函数 1 是可以接收  resolve 的函数
+	函数 2 可以进行错误处理，接收 reject 的参数 ，可以省略，最后使用 catch 即可
+promise.catch() 
+	 catch(failureCallback) 是 then(null, failureCallback) 的缩略形式
+promise.finally() 
+// 这些方法将进一步的操作与一个变为已敲定状态的 promise 关联起来
+// 些方法还会返回一个新生成的 promise 对象，这个对象可以被非强制性的用来做链式调用
+```
+
+
+
 ### 异步函数调用
 
 ```js
@@ -117,25 +142,30 @@ promise.prototype.finallly(onFinally)
 ```js
 // 	该构造函数会把一个叫做“处理器函数”（executor function）的函数作为它的参数
 //  “处理器函数”接受两个函数—— resolve 和 reject ——作为其参数
-//   	异步任务顺利完成且返回结果值时，会调用 resolve 函数
-//      异步任务失败且返回失败原因（通常是一个错误对象）时，会调用reject 函数
 let promise = new Promise((resolove,reject) => {
-    // 初始化 promise 状态为 pending 
-    // 做一些异步操作，最终会调用下面两者之一
-    
-    if (异步操作成功) {
-        resovle(value); // 修改 promise 状态为 fullfilled
-    } else {
-        reject(errMsg);  // 修改 promise 状态为 rejected
-    }
-    
-	// Promise 不论成功或失败都会调用 then 
-}).then()
-	// catch() 只有当 promise 失败时才会调用
-	// catch(failureCallback) 是 then(null, failureCallback) 的缩略形式
-  .catch()
+        // 初始化 promise 状态为 pending 
+        // 做一些异步操作，最终会调用下面两者之一
 
-promise
+        if (异步操作成功) {
+            // 异步任务顺利完成且返回结果值时，会调用 resolve 函数
+            // 修改 promise 状态为 fullfilled
+            // resolve 调用就会调用 then 中的函数 ，并将 value 传递给 then 中的函数
+            // resolve 就像是仅起了个通道作用
+            resovle(value); 
+        } else {
+            // 异步任务失败且返回失败原因（通常是一个错误对象）时，会调用reject 函数
+            // reject 函数会将 errMsg 传递给捕捉 错误信息的函数 catch
+            reject(errMsg);  // 修改 promise 状态为 rejected
+        }
+    })
+ // Promise 不论成功或失败都会调用 then 
+// 对 value 进行处理，通过 resolve 传递过来
+.then((value) => {})
+
+
+// catch() 只有当 promise 失败时才会调用
+// catch(failureCallback) 是 then(null, failureCallback) 的缩略形式
+.catch((errMsg) => {})
 
  
     
@@ -153,19 +183,6 @@ function(){
     即： 把传入回调函数，改成了绑定回调函数
 ```
 
-```js
-1. 异步编程的一种解决方案
-2. 我们封装一个网络请求的函数，因为不能立即拿到结果，所以需要传入另一个函数，在数据请求成功的时候，将数据通过传入的函数回调出去
-3. 当网络请求非常复杂的时候，就会出现回调地狱 
-
-// 链式编程
-套娃边串娃
-// 使用
-	有异步操作的时候，使用 promise 封装
-```
-
-
-
 ### 错误传递
 
 ```js
@@ -177,6 +194,24 @@ function(){
 意义
 	通过捕获所有的错误，甚至抛出异常和程序错误，Promise 解决了回调地狱的基本缺陷。
     这对于构建异步操作的基础功能而言是很有必要的。
+    
+    
+// 嵌套
+//  Promise 链式编程最好保持扁平化，不要嵌套 Promise
+//  不是一个简单的纯链式，这些语句前与后都被括号 () 包裹
+catch 仅捕捉在其之前同时还必须是其作用域的 failureres，而捕捉不到在其链式以外或者其嵌套域以外的 error
+
+f1()
+.then(
+    result => f2()
+    		.then(optionalResult => f3(optionalResult))
+    		// 能捕获到 f2() 和f3() 的失败，之后就恢复到 f4() 的运
+   			.catch(e => {console.log(e.message)})
+	) // 即使有异常也会忽略，继续运行;(最后会输出)
+.then(() => f4())
+// 能捕捉到f1 f2 f3 f4
+.catch(e => console.log("Critical failure: " + e.message));// 没有输出
+
 ```
 
 
@@ -188,16 +223,6 @@ function(){
     *   连续执行两个或者多个异步操作 ： 在上一个操作执行成功之后，开始下一个的操作，并带着上一步操作所返回的结果
     *   每一个 Promise 都代表了链中另一个异步过程的完成
 
-*   使用
-
-    ```js
-    promise.then()
-    promise.catch() 
-    promise.finally() 
-    // 这些方法将进一步的操作与一个变为已敲定状态的 promise 关联起来
-    // 些方法还会返回一个新生成的 promise 对象，这个对象可以被非强制性的用来做链式调用
-    ```
-
 *   多重回调
 
     ```js
@@ -205,22 +230,41 @@ function(){
     // 把回调绑定到返回的 Promise 上，形成一个 Promise 链：
     // 一定要有返回值，否则，callback 将无法获取上一个 Promise 的结果。
     new Promise((resolve,reject) =>{
-        setTimeOut(()=>{
-            reselve('aaa')
-        },1000)
-    }).then(res => {
-        console.log("第一层代码");
-         return Promise.resolv(res+'111')
-    }).then(res =>{
-        console.log("第二层代码");
-        return Promise.resolv(res+'222')
-    }).then(res => {
-        // 第三层演示吧报错
-         return Promise.reject(err message)
-        // throw 'err message'  也可以
-    }).catch(res => {
-        console.log(err);
+            setTimeOut(()=>{
+                reselve('hello')
+            },1000)
+        })
+    .then(res1 => {
+            console.log("第一层代码");
+        	// res2 = res1 + '111'
+        	// 方法一 ：return new Promise(resolve => resolve(res2) )
+        	// 方法二 ： return res1 + '111'
+        	// 方法三 ：
+             return Promise.resolve(res2)
+        })
+    .then(res2 =>{
+            console.log("第二层代码");
+        	// res4= res3+ '222' 	
+            return Promise.resolve(res3)
+        })
+    .then(res3 => {
+            // 第三层演示吧报错
+             return Promise.reject(errMsg)   
+        })
+    .catch(errMsg => {
+        console.log(errMsg);
     })
+    
+    
+    // 注意
+    链式跳转 ：出错跳转， 主要是 then(resolve , reject) 缩写为 then
+        .then(res1 => {
+            // 这里会直接跳到 cath() 中，中间的其他 then 不会执行
+        	// 方法一 ：return new Promise((resolve, reject) => {reject(err)})
+        	// 方法二 ：  throw 'err message' 可以直接被 catch 捕获异常
+        	// 方法三 ：
+    		return Promise.reject(err)
+        })
     ```
 
 ### 拒绝事件
@@ -239,6 +283,8 @@ promise 两个全局作用域
 ```
 
 ## 其他
+
+*   promise 尽量不要嵌套多层 promise
 
 ### 组合并行
 
@@ -281,99 +327,45 @@ console.log(1); // 1, 2, 3, 4
 	它是在 JavaScript 事件队列的所有运行时结束了，且事件队列被清空之后，才开始执行
 ```
 
-
-
-### 嵌套
+### 双请求(同时返回才执行)
 
 ```js
-//  Promise 链式编程最好保持扁平化，不要嵌套 Promise
-//  不是一个简单的纯链式，这些语句前与后都被括号 () 包裹
-catch 仅捕捉在其之前同时还必须是其作用域的 failureres，而捕捉不到在其链式以外或者其嵌套域以外的 error
-
-f1()
-.then(
-    result => f2()
-    		.then(optionalResult => f3(optionalResult))
-    		// 能捕获到 f2() 和f3() 的失败，之后就恢复到 f4() 的运
-   			.catch(e => {console.log(e.message)})
-	) // 即使有异常也会忽略，继续运行;(最后会输出)
-.then(() => f4())
-// 能捕捉到f1 f2 f3 f4
-.catch(e => console.log("Critical failure: " + e.message));// 没有输出
-
+// 处理异步请求，需要俩个请求同时返回才能进行处理
+Promise
+.All([
+    new Promise((resolve,reject) => {
+        $ajax({
+            url:'',
+            success:function(data1){
+                resolve(data1)
+                console.log("结果1")
+            }
+        })
+    })，
+    new Promise((resolve,reject) => {
+        $ajax({
+            url:'',
+            success:function(data2){
+                resolve(data2)
+                console.log("结果2")
+            }
+        })
+    })，
+    // 前面所有请求完成，才会执行下面的then
+])
+.then(results => {
+    // result[data1 , data2 ]
+    // result[0]  是第一个new Promise 的结果  data1
+    // result[1]  是第二个 new Proise 的结果  data2
+})
+    
 ```
 
 
 
-### demo
-
-![image-20201220172408204](image-20201220172408204.png)
+### ajax 实现
 
 ```js
-// Promise()   是一个构造函数，用来生成一个 Promise 实例
-
-promise 对象的状态
-
-    
-应用
-	实现超时处理
-
-
-//调用 promise 的then 
-promise
-	.then((data)=>{console.log(data)},(error)=>{})
-//-----------------------------------------------------------------------------
-
-
-// promise 链式地调用
-new Promise((resolve,reject) =>{
-    setTimeOut(()=>{
-        reselve('aaa')
-    },1000)
-}).then(res => {
-    console.log("第一层代码");
-     return Promise.resolv(res+'111')
-}).then(res =>{
-    console.log("第二层代码");
-    return Promise.resolv(res+'222')
-}).then(res => {
-    // 第三层演示吧报错
-     return Promise.reject(err message)
-    // throw 'err message'  也可以
-}).catch(res => {
-    console.log(err);
-})
-
-//---------------------------------------------------------
-
-// 超时例子
-// 创建 promise 对象 ，promise 进行判断 then 是执行代码
-// resolove reject 本身就是也是一个函数
-let promise = new Promise((resolve,reject) => {
-    // 初始化 promise 状态为 pending
-    
-    // 执行 异步操作 ,通常是发送 ajax 请求，开启定时器
-    setTimeout(()=>{
-
-        // 根据异步任务的返回结果来修改 promise 的状态
-        // 异步任务执行成功 ，调用 resolve 的时候就会调用 then
-        resolve("data");   // 修改 promise 的状态为 fullfilled 成功的状态
-        // 异步任务失败
-        reject();  // 执行这个, 把error 传给 then 
-    })
-}，2000).then((data)=>{  // 成功回调执行的代码
-    
-    // .then (函数1，函数2)   回调成功执行函数1 回调从失败执行函数2  
-	}).catch((err) => { // 失败的回调执行的代码
-        console.log(err)
-    })
-    	
-    
-    
-// -----------------------------------------------------------------------
-
-// new Promise(resolve => resolve(结果))
-
 
 // 实际例子 ajax 
 function getNews(url){
@@ -415,30 +407,36 @@ getNews(url)
     	console.log(error);
 	})
     .then((data)=>{console.log(data)},(error)=>{})
-// ---------------------------------
-// 处理异步请求，
-Promise
-.All([
-    new Promise((resolve,reject) => {
-        $ajax({
-            url:'',
-            success:function(){
-                console.log("结果1")
-            }
-        })
-    })，
-    new Promise((resolve,reject) => {
-        $ajax({
-            url:'',
-            success:function(){
-                console.log("结果2")
-            }
-        })
-    })，
-    // 前面所有请求完成，才会执行下面的then
-])
-	.then(results => {
-    // result[0]  是第一个new Promise 的结果，类推
-})
+```
+
+
+
+### demo
+
+![image-20201220172408204](image-20201220172408204.png)
+
+```js
+// 超时例子
+// 创建 promise 对象 ，promise 进行判断 then 是执行代码
+// resolove reject 本身就是也是一个函数
+let promise = new Promise((resolve,reject) => {
+    // 初始化 promise 状态为 pending
     
+    // 执行 异步操作 ,通常是发送 ajax 请求，开启定时器
+    setTimeout(()=>{
+
+        // 根据异步任务的返回结果来修改 promise 的状态
+        // 异步任务执行成功 ，调用 resolve 的时候就会调用 then
+        resolve("data");   // 修改 promise 的状态为 fullfilled 成功的状态
+        // 异步任务失败
+        reject();  // 执行这个, 把error 传给 then 
+    })
+}，2000).then((data)=>{  // 成功回调执行的代码
+    
+    // .then (函数1，函数2)   回调成功执行函数1 回调从失败执行函数2  
+	}).catch((err) => { // 失败的回调执行的代码
+        console.log(err)
+    })
+    	
+
 ```
