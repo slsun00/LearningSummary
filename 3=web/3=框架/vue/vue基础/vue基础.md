@@ -334,6 +334,7 @@ runtime and compiler  区别
 	组件只能有一个根元素
     html 大小写不敏感，所以你使用驼峰命名，在标签中需要用 - 连接
 	局部的 components 和全局 的 component
+    所有的组件都继承于 vue 实例的原型
 ```
 
 ### 原理
@@ -910,7 +911,7 @@ query 类型
 
 ```js
 介绍
-	路由跳转是一个恨到的过程，这个过程被 Vue 分成好几个阶段，每一个阶段都有一个函数(钩子函数) ，你可以通过这些函数在响应的阶段，进行其他操作 ，这就是导航守卫
+	路由跳转是一个很大的过程，这个过程被 Vue 分成好几个阶段，每一个阶段都有一个函数(钩子函数) ，你可以通过这些函数在响应的阶段，进行其他操作 ，这就是导航守卫
     即
     	vue  通过一些函数控制了路由跳转的过程，这些函数指导这个过程进行跳转实现，为跳转保驾护航 ， 这些函数就叫导航守卫(抖个机灵：这个过程或许可以叫守卫导航，2333)
 	监听路由跳转
@@ -983,6 +984,128 @@ router-view
     
 
     ![image-20210111153158224](image-20210111153158224.png)
+
+## vuex
+
+### 介绍
+
+```js
+状态管理模式、集中式存储管理
+	需要多个组件共享的变量全部存储在一个对象里 ，这个对象放在 顶层的vue实例中，让其他组件可以使用(共享使用)
+	这个对象就像是大管家 ，公共对象 ，应用单一模式
+    
+所有组件都继承 vue 原型
+
+```
+
+
+
+*   不要上来就用，不然不适合
+
+### API 解读
+
+```js
+store 选型构造器
+store 实例属性
+store 实例方法
+组件绑定的辅助函数
+```
+
+### 状态管理
+
+![https://vuex.vuejs.org/vuex.png](vuex.png)
+
+### 使用
+
+```js
+多个组件间共享的问题
+	1. 用户的登录状态、用户名称、头像、地理位置等
+    2. 商品的收藏、购物车物品
+    3. token
+    这些状态信息。可以统一放在一个地方，进行保存管理，而且是响应式的
+    
+// 注意
+    官方是 建立一个store对象，
+    	修改
+        	本组件 ： 使用 mutations 中的方法
+            其他组件 ： this.$store.commit(mutation中的方法)
+        引用  $store.state.属性 进行访问
+```
+
+### 单一状态树
+
+```js
+Vue.prototype.S
+```
+
+### 核心概念
+
+#### getters
+
+```js
+getters
+	// getters 的fucntion的参数是固定的
+	// 作为参数
+		getters: {
+            getage: state => {
+                return state.stu.fiter(s => s.age >= 20)
+            },
+            count: (state,getters) => {
+                return getters.getage.length
+            }
+        }
+	// 传递参数
+    //  getters 默认不能传递参数的，如果让其返回一个参数，只能让 getters 本身返回另一个函数
+	getters: {
+        stuID : sstate => {
+            return id =>{return state.stu.find(s => s.id === id )}
+        }
+    }
+```
+
+#### mutation
+
+```js
+在 mutation 更新数据的时候，需要携带额外的参数
+	这些参数被称为 mutation 的载荷(Payload)
+new vue {
+    methods: {
+        addname(count): {
+            // count 可以是传入的，也可以方法内部声明的 可以是对象
+            // 普通提交风格
+            this.$store.commit(addname,count)
+            
+            // 特殊提交
+            this.$store.commit({
+                type: 'addname',
+                count :count  // 可以缩写成 一个 count
+            })
+        }
+    }
+}
+
+new vuex.store({
+    state: {
+        counter:100
+    }
+    mutation: {
+        addname(state,count) {
+            state.count += count
+        }
+		// 特殊提交
+	    addname(state,payload) {
+            state.count += payload.count
+        }
+    }
+})
+
+
+// 响应规则
+	delete a  // 不是响应式
+	Vue.delete() // 响应式的
+```
+
+
 
 
 
