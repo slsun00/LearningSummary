@@ -1,17 +1,10 @@
 gitgithttps://blog.csdn.net/chengyu_whu/article/details/80048038
 
-## git
 
-### 配置
 
-```go
-// 显示当前 git 配置信息
-    git config --list
 
-// 编辑 git 配置文件
-    git config -e    // 针对当期那仓库
-    git config -e --global //针对系统上所有的仓库
-```
+
+
 
 ## 仓库
 
@@ -21,77 +14,14 @@ gitgithttps://blog.csdn.net/chengyu_whu/article/details/80048038
 2. Git 只在仓库的根目录生成 .git 目录
 ```
 
-### 1. 创建仓库
 
-#### 本地初始化
 
-```go
-git init [filename]
-
-1. 省略 filename
-    当前目录作为仓库
-2. 不省略
-    指定文件作为仓库
-
-3. 一般只初始化一次
-
-// 刚创建远程库的时候，里面貌似就有，直接 pull 下来，貌似就是有 .git 文件了
-```
-
-#### 远程库克隆
-
-```go
-// 克隆下来的文件中，自带 .git 文件
-git clone <协议> [别名]
-
-// <协议> ：http ssh 等
-git clone  https://gitee.com/slsun00/test.git
-    当前目录下创建一个 test 文件，改文件中有一个 .git文件
-
-// [别名] 自定义要新建的项目目录名称，可以在上面的命令末尾指定新的名字：
-git clone https://gitee.com/slsun00/test.git mytest
-git clone https://gitee.com/slsun00/test mytest
-```
-
-#### .git 文件
+### .git 文件
 
 ```go
 // 产生 .git 文件
 // .git目录中存放的是本地库相关的子目录和文件，不要删除，也不要胡乱修改。
 ```
-
-### 2. 用户邮箱
-
-* 作用
-
-    * 区分不同开发人员的身份,和登录远程库(代码托管中心)的账号、密码没有任何关系。
-
-* 项目级别/仓库级别
-
-    * 仅在当前本地库范围内有效
-
-        ```go
-        //  信息保存位置  ./.git/config 文件
-            git config user.name 666
-            git config user.amil 123@qq.com
-        ```
-
-* 系统用户级别
-
-    * 登录当前操作系统的用户范围
-
-        ```go
-        // 信息保存位置 ~/.gitconfig 文件
-        // 一般设置这个就行了
-        
-            git config -globle user.name  666
-            git config -globle user.email 123@qq.com
-        ```
-
-* 优先级
-
-    * 两者必须有一个，一般设置系统用户级别就行
-    * 就近原则 ：项目级别大于系统用户级别
 
 ### 3. 分支管理
 
@@ -344,43 +274,7 @@ git mv <file> <destination directory>
 
 ## 操作远程库
 
-### 远程库
 
-```css
-上游版本库
-    1. 广义上来说，当前版本库之外的版本库都是远程版本库，
-    2. 上游版本库指的是通过git clone 或 git remote add 所指向的那个版本库。
-    总述
-        上游版本库是远程版本库的一个子集。
-        实际工作中，几乎所有的版本库都是通过git clone而来，所以一般情况下远程版本库和上游版本库是同一个意思。
-远程版本库
-	1. Git版本库来说，从广义上来讲，除了本身以外，其他的版本库都是远程版本库。
-	2. 每个版本库都是平等的，无非是有的版本库处于同一个本地磁盘，有的在网络上。根据所处的位置不同，Git会采用不用的通信协议来进行交互。在本地就用本地协议，在网络上就用 SSH ,GIT,HTTP(S),FTP(S)等网络协议。不同的协议对使用来讲具体来说就是URL不同，其他的原理和使用方式没有任何不同。
-
-
-远程中央版本库
-	各版本库之间没有主次之分，是平等的，但是很难做到，所以就一定要在这个团队中固定一个人的版本库 ， 我们需要找一个空闲的单独的稳定的服务器来做这个版本库，大家都从这里更新，向这个提交。这个版本库就是实际工作中的“远程版本库
-```
-
-
-
-### 参看远程库
-
-```go
-git remote 
-git remote -v  // (推荐) 到每个别名的实际链接地址
-
-git remote show [remote] // 显示某个远程仓库的信息
-```
-
-### 添加远程库
-
-* 设置远程库本地别名
-
-```go
-git remote add 别名(origin)  https
-// git remote add origin https://github.com/slsun00/learn-code.git
-```
 
 ### 库短名修改
 
@@ -393,45 +287,7 @@ git remote rename 旧名称 新名称
 // 其对应的分支名称也变了  pd/master  改成 paul/master
 ```
 
-### 克隆远程库
 
-```css
-克隆方法
-    用法1 : git clone <repository> <directory>
-        clone一个对等的版本库 A ,对等版本库A 和 git-demo有着同样的工作区，同时也有.git目录
-
-
-    用法2 : git clone --bare <repository> <directory>
-        clone一个裸的版本库 B , 裸版本库B里面直接就是.git目录里面的内容
-
-
-    用法3 : git clone --mirror <repository> <directory>
-        clone一个裸的镜像版本库 C , 裸版本库B里面直接就是.git目录里面的内容
-
-
-    方法1
-        克隆一个 <repository>指向的版本库到 <directory> 目录，
-        相当于copy了一个 repository的副本，里面有着一样的工作区，一样的 .git目录。
-        差别是新克隆出来的这个版本库里的.git/config文件会记录上游版本库repository的位置。
-    方法2
-        克隆出来的版本库不包括工作区，直接就是版本库的内容，也就是不包括.git目录而是直接就是.git目录里面的内容。
-        这样的版本库称为裸版本库。(通过bare名字就可以看出)
-    方法3
-        法2类似，也是克隆出一个裸版本库。不过是可以通过git fetch命令与上游版本库repository持续同步。
-------------------------------------------------------------------------------------------------
-注意
-	/* 远程版本库的后缀是'.git',根据前面介绍的约定 '.git'后缀的版本库是裸版本库。*/
-	$git clone git@github.com:christian-tl/git-demo.git
-        
-	1. 远程版本库服务器上面的版本库都是裸版本库 
-	2. 克隆下来的版本库会默认把他所克隆的这个版本库注册为上游版本库,并且起名为 origin
-    3. 游版本库可以叫任何名字，只不过origin是git默认的上游版本库的名字，当需要写这个名字的地方却省略时，git默认认为是origin
-    4. git 做了一个本地master分支和远程版本库master分支的映射。
-		本地master分支上执行git pull origin master等价于 git pull
-        			  执行git push origin master等价于 git push
-    5.  git clone之后版本库默认只有一个master分支，master分支指向了origin/master分支相同的提交号
-    6. git clone 命令会把远程版本库的git对象下载下来到 .git/objects目录里，把分支引用保存到.git/packed-refs文件中。得到了引用和git对象，就得到了整个版本库了
-```
 
 ### 提取远程库更新
 
@@ -510,46 +366,6 @@ push不光可以推送到远程已经存在的分支，也可以推送到不存�
 ```
 
 
-
-## 版本库初始化
-
-### 基础 
-
-```css
-分类
-	版本库
-        工作区的版本库主要用于日常工作
-        先把代码提交到本地的版本库中，然后通过本地库推送到服务器上的版本库中。
-    裸版本
-        主要存在于服务器上，作为集中式的版本仓库存在。
-        因为没有人会在服务器上修改代码并提交，所以这类版本库不需要工作区。
-		当然其创建方式也略微不同与带工作区的版本库
-```
-
-### 裸版本库
-
-```css
-
-初始化
-	$ git init --bare
-	/* 为了方便查看，一般会把裸版本库的目录名称中加上 .git 后缀 */
-	$ git init –bare hello.git 
-版本库 ---> 裸版本库
-	裸版本库没有工作区，所以无法直接把代码提交到裸版本库中。
-	通用的做法是先克隆裸版本库，在本地库中提交，然后推送到裸版本库中。
-
-	方法 1，从现有库克隆出来一个裸版本库：
-
-        $ git clone –bare hello hellobare.git
-
-        用 git log 命令查看版本库 hellobare.git，它的历史记录和版本库 hello 是一样的。
-
-    方法 2，把已有库推送到裸版本库：
-
-        $ git push –all hellobare2.git
-
-        用 git log 命令查看 hellobare2.git 库，它的历史记录和版本库 hello 也是一样的。
-```
 
 
 
