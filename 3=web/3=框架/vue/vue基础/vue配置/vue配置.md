@@ -127,9 +127,15 @@ components
 	删除 hellowoeld 文件
 
 views:app.vue 
-	注意保留路由出口清除自带样式，补上 script 
-	import helloword  注释或者删除掉
-	expert default 中的 components 中的 helloword 删除
+	template 
+		内部删除
+		保留 #app 标签
+	style 
+		里面的东西删除
+	script
+        注意保留路由出口清除自带样式，补上 script 
+        import helloword  注释或者删除掉
+        expert default 中的 components 中的 helloword 删除
 /*如果你顺带下载le router 还需要清除router中的内筒*/
 router  index.js
 	路由清除，
@@ -140,22 +146,31 @@ views:home.vue
 	
 ```
 
-### 添加文件
+### 目录划分
 
-```js
-src -- asserts
-	css  放公共css
-    img  放入片
+*   src 目录
+
+    ```js
+    asserts
+    	css  放公共css
+        img	  放文件夹
+    components	放公共的组件
+    	common  公共的,完全可以独立的组件
+        content	 和业务相关的，跟当前期项目有关
+    router		路由
+    store		vuex 状态管理
+    network		网络请求相关
+    common		公共的js文件
+    	const.js	公共常量抽取
+        utils.js	公共的方法
+        mixin.js	混入
     
-src-- App.vue  导入的东西
+    views 里面是私有组件和界面
+    
+    App.vue  导入的东西
+    ```
 
-components  放一写公共的组件
-views 里面是私有组件和界面
-
-
-
-// 链接式和导入式的区别
-```
+    
 
 ### 运行
 
@@ -164,6 +179,64 @@ cli2
   cd tabbar
   npm run dev
 ```
+
+### 注意
+
+```js
+.git 文件，是 git 的配置未见，
+node_modules  是 node 的配置文件，
+	这两个是忽略的
+```
+
+### 别名配置
+
+```js
+// cli3
+新建一个 vue.config.js文件
+
+module.exports = {
+	configureWebpack: {
+		// extensions: []  可以省略的文件后缀
+		alias: {
+			// '@' : 'src', 默认的
+			'assets':'@/assets',
+			'common':'@/common',
+			'componets':'@/componets',
+			'network':'@/network',
+			'views':'@/views',
+		}
+	}
+}
+```
+
+
+
+### 风格控制
+
+```js
+// 创建 .editorconfig
+root = true
+
+[*]
+charset = utf-8
+indent_style = space
+indent_size = 2
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+```
+
+### 浏览器适配
+
+```js
+// 创建 .browserslistrc
+> 1%
+last 2 versions
+not dead
+```
+
+
 
 
 
