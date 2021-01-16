@@ -1,13 +1,15 @@
 <font size=5 color=yellow>map(映射)</font>
 
-## 1.概念
+## 介绍
+
+### 1.概念
 
 *  引用类型 ，引用类型传递的机制，在一个函数接收 map,修改后，会直接修改原来的map
 *  是一种特殊的数据结构，
 *  一种元素对（pair）的无序集合，pair 对应一个 key（索引）和一个 value（值）
 *  这是一种能够快速寻找值的理想结构，给定 key，就可以迅速找到对应的 value。
 
-## 2.别称
+### 2.别称
 
 ```go
 HashTable 
@@ -17,96 +19,109 @@ hash
 关联数组   类似其他语言的集合
 ```
 
-## 3.声明/初始化
+## 声明/赋值
 
-* 标准格式
+### 介绍
 
-    ```go
-    // 声明是不会分配内存的，初始化需要make，分配内存后才能赋值和使用
+```js
+格式
+	变量的四种形式
+声明后未赋值
+	// 引用类型，初始化默认值为 nil , 本身是空的， 不能使用
+	1. 让其引用到一个map，
+    	 var a map[string]int                       
+          a = map[string]int{"one": 1, "two": 2}
+	2. make一个空间供map来使用,分配内存后才能赋值和使用
+		var a map[string]int                       
+         a = make(map[string]int)
+函数
+	make(map[keytype]value_Type，cap)  在使用之前需要make，就是给 map 分配数据内存
+        mapname 为 map 的变量名。
+        keytype 为键类型。 
+        value_Type 是键对应的值类型。可以是任意 go 数据类型
+标准格式	
+    // 声明是不会分配内存的，初始化需要make，
     var mapname map[keytype]valuetype
-    make(map[keytype]valuetype)  在使用之前需要make，就是给 map 分配数据内存
+    mapname = make(map[keytype]valuetype)
+	    1.key        :所有类型，通常是int string,不可重复，重复以最后一个为准
+        2.keytype    ：通常为int string,但是不能是slice,map,function不可以，因为这几个没法用 == 来判断 
+        3.value      :所有类型，可以重复
+        4.valuetype  ：与keytype 的类型一致，通常为int float string map struct
+        
+声明后赋值
+	1. var a map[string]string
+   	a = make(map[string]string,10)  //分配内存
+   	a["1"] = "上海"
+
+声明的时候赋值
+	var a map[string]int = map[string]int{"one": 1, "two": 2}
+	// 右边值换行的时候，要加上最后一个逗号
+	var a map[string]int = map[string]int{
+        								"one": 1, 
+                                            "two": 2，
+    								   }
+
+复合类型使用
+	//value类型是以整型为切片的指针类型
+	mp2 := make(map[int]*[]int)       
+	 //valuetype的类型是 map ，对于值的处理可以用 a[1] := make(map[string]string)
+    a := make(map[string]map[string]string) 
     
-    mapname 为 map 的变量名。
-    keytype 为键类型。 
-    valuetype 是键对应的值类型。
-    
-    //备注：
-    1.key        :所有类型，通常是int string,不可重复，重复以最后一个为准
-    2.keytype    ：通常为int string,但是不能是slice,map,function不可以，因为这几个没法用 == 来判断 
-    3.value      :所有类型，可以重复
-    4.valuetype  ：与keytype 的类型一致，通常为int float string map struct
-    5.map是无序的，使用之前要make
-    6.声明的时候不需要知道 map 的长度，因为 map 是可以动态增长的，未初始化的 map 的值是 nil，
-    ```
+注意
+	1.上面没有使用 make 的例子，都有引用一个map(后面都有 {} 把所有的key 和 value 都列出来)
+	2. 不能用 m := map[int]int 但是可以用 m:=map[int]int{}
+```
 
-* 声明赋值初始化：
+### New()
 
-    ```go
-    1. var a map[string]string
-       	a = make(map[string]string,10)  //分配内存
-       	a["1"] = "上海"
-      
-    2.a := map[string]string{
-        "1" : "上海" ， //类型推导，注意逗号不能少
-        //初始化不换行，就不用最后一个逗号，但是换行了就需要
-    }
-    
-    3. var a map[string]int                       
-      a = map[string]int{"one": 1, "two": 2}
-      
-    4. var a map[string]int = map[string]int{"one": 1, "two": 2}
-      
-    5.注意复合类型的应用
-    mp2 := make(map[int]*[]int)       //value类型是以整型为切片的指针类型
-    a := make(map[string]map[string]string)  //valuetype的类型是 map ，对于值的处理可以用 a[1] := make(map[string]string)
-    
-    备注：
-    	1.上面没有使用 make 的例子，后面都有 {} 把所有的key 和 value 都列出来
-    	2. 不能用 m := map[int]int 但是可以用 m:=map[int]int{}
-    ```
+```go
+注意
+	不能使用 new() 来构造 map，
+	不能使用 new() 来构造 map，
+	不能使用 new() 来构造 map，
 
-* New()
+// 如果错误的使用 new() 分配了一个引用对象，会获得一个空引用的指针，相当于声明了一个未初始化的变量并且取了它的地址，编译就会出错
 
-    *   不能使用 new() 来构造 map，
+// 使用new来创建并使用map：
 
-    ```go
-    // 不能使用 new() 来构造 map，
-    
-    // 如果错误的使用 new() 分配了一个引用对象，会获得一个空引用的指针，相当于声明了一个未初始化的变量并且取了它的地址，编译就会出错
-    
-    // 使用new来创建并使用map：
-    
-            ma := new(map[string]int)    //使用new创建一个map指针
-    //第一种初始化方法
-            *ma = map[string]int{}      //注意int后面的  {}，第二种是没有的
-            (*ma)["a"] = 44
-            fmt.Println(*ma)
-               
-    //第二种初始化方法
-            *ma = make(map[string]int, 0)
-            (*ma)["b"] = 55
-            fmt.Println(*ma)
-               
-    //第三种初始化方法
-            mb := make(map[string]int, 0)
-            mb["c"] = 66
-            *ma = mb
-            (*ma)["d"] = 77
-    ```
+        ma := new(map[string]int)    //使用new创建一个map指针
+//第一种初始化方法
+        *ma = map[string]int{}      //注意int后面的  {}，第二种是没有的
+        (*ma)["a"] = 44
+        fmt.Println(*ma)
+           
+//第二种初始化方法
+        *ma = make(map[string]int, 0)
+        (*ma)["b"] = 55
+        fmt.Println(*ma)
+           
+//第三种初始化方法
+        mb := make(map[string]int, 0)
+        mb["c"] = 66
+        *ma = mb
+        (*ma)["d"] = 77
+```
 
-## 4.容量
+## 特点
 
-* map 可以根据新增的 key-value 动态的伸缩，因此它不存在固定长度或者最大限制，但是也可以选择标明 map 的初始容量 capacity， 
+### 无序
 
-* map 容量达到后，在想增加 map 元素，会自动扩容，并不会发生panic，map 的大小会自动加 1，
+```go
+map是无序的
+```
 
-* 出于性能的考虑，对于大的 map 或者会快速扩张的 map，即使只是大概知道容量，也最好先标明。
+### 容量
 
-    ```go
-    make(map[keytype]valuetype, cap)
-    ```
+```go
+声明的时候不需要知道 map 的长度，因为 map 是可以动态增长的，未初始化的 map 的值是 nil，
+map 可以根据新增的 key-value 动态的伸缩，因此它不存在固定长度或者最大限制，但是也可以选择标明 map 的初始容量 capacity， 
+map 容量达到后，在想增加 map 元素，会自动扩容，并不会发生panic，map 的大小会自动加 1，
+出于性能的考虑，对于大的 map 或者会快速扩张的 map，即使只是大概知道容量，也最好先标明。
+```
 
-## 5操作
+
+
+## 操作
 
  ### 1.增加/更新
 
@@ -119,30 +134,32 @@ a[key]  = value
 
 ### 2.删除
 
-   * delete( mapname, key)
-
    ```go
-//delete是内置函数，从 map 中删除一组键值对
-// 如果 key 存在就删除，
-// 如果 key 是 nil 或者 不存在，delete 不会进行操作，但是也不会报错  
+内建函数
+	delete( mapname, key)
+	 如果 key 存在就删除
+	 如果 key 是 nil 或者 不存在，delete 不会进行操作，但是也不会报错
+
 
 func delete(m map[Type]type1,key Type)内建函数按照指定的键将元素从映射中删除，若为 nil 或者无此元素，不进行操作
 
+注意
+1. 没有办法一次删除所有的key,
+	1. 遍历所有的 key 进行删除
+	2. map = make()  来创建一个新的，让原来的成为垃圾，被GC回收
+	（Go语言中的并行垃圾回收效率比写一个清空函数要高效的多。 ）
+	3. 直接给 map 赋值 nil 
    ```
-
-   注意：
-
-   * 没有办法一次删除所有的key,
-     *   遍历所有的 key 进行删除
-     *   map = make()  来创建一个新的，让原来的成为垃圾，被GC回收（Go语言中的并行垃圾回收效率比写一个清空函数要高效的多。 ）
-     *   直接给 map 赋值 nil 
 
 ### 3.查找
 
-   * 这个地方遍历的是 key ，找到这个 key ，然后再找这个 key 所对应的value,找到了，就返回 value ,找不到就返回false
-
    ```go
-   val , ok := a["key"]
+介绍
+	遍历的是 key
+		找到这个 key ，然后再找这个 key 所对应的value,
+		找到了，就返回 value ,找不到就返回false
+语法
+    val , ok := a["key"]
    //OK是看当前 key 是否存在返回布尔类型(存在为真,不存在为假)
    //val 返回对应 key 的值
    
@@ -155,8 +172,6 @@ a := make(map[string]map[string]string)
    	for k2,v2 = range v1{
    		}
    	} 
-    
-
    ```
 
 
@@ -190,7 +205,11 @@ for _, value := range map{}
 * map默认是无序的，注意也不是按照添加的顺序存放的，每次遍历可能不一样
 * 要进行排序是对 key 进行排序，然后根据key遍历输出即可
 
-## 6.map切片
+
+
+## 场景使用
+
+### 6.map切片
 
 * 切片的数据类型是map,则称为slice of map，这样使map的个数可以动态变化
 
@@ -200,7 +219,7 @@ for _, value := range map{}
     var newtest []map[string]string
     ```
 
-## 7.多键索引
+### 7.多键索引
 
 *   介绍
 
@@ -221,7 +240,7 @@ for _, value := range map{}
     
     ```
 
-## 8.并发中的map
+### 8.并发中的map
 
 *    map 在并发情况下，只读是线程安全的，同时读写是线程不安全的。 
 
