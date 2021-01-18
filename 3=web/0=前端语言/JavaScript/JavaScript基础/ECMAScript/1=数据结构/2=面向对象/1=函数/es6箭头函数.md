@@ -157,3 +157,34 @@ callback = callback || (() => {});    // ok
 
 
 
+## 简写
+
+```js
+// 函数体只有一行，函数可以写成一行
+let myAdd = function(x: number, y: number): number { return x + y; };
+
+let a 
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
