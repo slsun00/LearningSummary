@@ -460,7 +460,7 @@ class FAther {
 }
 class Son extends Father {
     constructor () {
-        super();	// 调用父类中的构造函数
+        super();	// 调用父类中的构造函数,也可以进行传参
     }
     say() {
         super.say();	// 调用父类的普通方法
