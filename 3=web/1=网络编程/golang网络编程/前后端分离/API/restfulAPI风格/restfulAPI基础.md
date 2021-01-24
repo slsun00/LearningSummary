@@ -8,24 +8,3 @@
 *   只要API程序遵循了REST风格，那就可以称其为RESTful API
 *   目前在前后端分离的架构中，前后端基本都是通过RESTful API来进行交互。
 
-## 比较
-
-*   普通的
-
-    ```go
-    get("/book",...)		// 查询
-    get("/create_book",...)  // 创建
-    get("/update_book",...)  // 更新
-    get("/delete_book",...)  // 删除
-    ```
-
-*   使用restful
-
-    ```go
-    get("/book",...)	// 查询
-    push("/book",...)	// 创建
-    put("/book",...)	// 更新
-    delete("/book",...)	 // 删除
-    ```
-
-    

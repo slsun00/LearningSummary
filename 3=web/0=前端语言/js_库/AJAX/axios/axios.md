@@ -25,6 +25,32 @@ https://github.com/axios/axios
 axios 会将对象转换为 jsoN
 ```
 
+## json 转换
+
+```js
+介绍
+	后端返回的都是字符串
+ 查看
+ 	通过 调试工具的 Netwprk --> response 网络面板查看原始的返回数据
+ 发送数据
+ 	ajax 发送 json 字符串
+ 注意
+ 	axios 会把 json 字符串转换为 js 对象
+    比较大的数字，会出现不准确的情况
+ 解决
+ 	// json-bigint 库
+ 	 axios 使用 json.parse 把后端返回的数据转为 js 对象
+     不让 axios 使用 json.parse 来转换数据 ， 而是使用 json-bigint 来转换数据
+ 使用
+ 	axios.create({
+        trancsformRequest: [function (data) {
+            //......
+        }]
+    })
+```
+
+
+
 ## 难点
 
 ### axios.create(config)
