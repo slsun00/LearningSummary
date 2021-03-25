@@ -116,7 +116,7 @@ function myFunction(){
 
 
 
-### 2. 请求方式及url
+### 2. 使用请求方式
 
 ```go
 // 对请求的类型、URL 以及是否异步处理请求
@@ -135,17 +135,7 @@ xhr.send();
 
 ```
 
-### 3. 发送
-
-```js
-
-// 将请求发送到服务器
-xhr.send(string)
-	string 仅适用于 POST 请求
-
-```
-
-### 4.响应数据处理
+### 4.响应处理
 
 ```js
 // 事件绑定，处理服务器返回的结果
@@ -155,7 +145,7 @@ xhr.onreadystatechange = function(){
         // 判断响应状态码 200 404 。。
         if (xhr.status >= 200 && xhr.status < 300){
             // 处理结果 行 、头、空行 、体
-
+            // xml json 处理
         }
     }
 }
@@ -173,7 +163,6 @@ xhr.responseXML		获得 XML 形式响应数据
 #### XML
 
 ```js
-
 xmlDoc = xmlhttp.responseXML
 
 x= xmlDoc.getElementByTagName("ARTIST");
@@ -203,6 +192,18 @@ document.getElementById("myDiv").innerHTML = txt
 
 
 
+### 3. 发送
+
+```js
+
+// 将请求发送到服务器
+xhr.send(string)
+	string 仅适用于 POST 请求
+
+```
+
+
+
 ## 其他
 
 ### 请求头设置
@@ -216,7 +217,7 @@ xhr.setRequestHeader(header,value)
     
 // 实际例子
 xhr.setRequestHeader("Content-type","application/x-www-form-urlencoded");
-xhr.setRequestHeader("naem","666");
+xhr.setRequestHeader("name","666");
 xhr.send("fname=Bill&lname=Gates");
 
 // 请求请求报文中添加了不是预定义的类型，就会报错 ：Provisional headers are shown ,
@@ -254,8 +255,6 @@ $.ajax({
 c.Data["json"] = map[string]string{"code":200,"message":"上传成功"}
 c.ServeJSON()
 ```
-
-### 
 
 ## 服务器响应
 

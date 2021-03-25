@@ -1,0 +1,201 @@
+# spring 注解
+
+## 对象创建
+
+```java
+对象创建
+	@Component		用在类上用于实例化Bean
+    @Service		使用在service层类上用于实例化Bean
+    @Controller		使用在web层类上用于实例化Bean
+    @Repository    	 使用在dao层类上用于实例化Bean
+```
+
+
+
+## 属性注入
+
+```java
+属性注入
+    @Autowired：
+        使用在字段上用于根据属性类型进行自动装配，
+        按照数据类型从 spring 容器中匹配
+    @Qualifier()：
+        根据名称进行注入， 结合@Autowired一起使用
+        按照 id 值从容器中进行匹配
+    @Resource()： 
+        按照名称进行注入， 相当于@Autowired+@Qualifier 
+        可以根据类型注入，可以根据名称注入   
+    @Value：  
+        注入普通类型属性 
+    @Scope			
+    @PostConstruct	 使用在方法上标注该方法是Bean的初始化方法
+    @PreDestroy		 使用在方法上标注该方法是Bean的销毁方法
+    
+    @PropertySource	
+    @ComponentScan
+    @Bean
+    @Configuration
+    @Import
+```
+
+
+
+## 方法增强
+
+```java
+@Before
+@AfterReturning
+@Around
+@AfterThrowing
+@After
+```
+
+## 数据库
+
+```java
+    @Configuration //配置类
+    @ComponentScan(basePackages = "com.atguigu") //组件扫描
+    @EnableTransactionManagement //开启事务
+
+ @Transactional
+```
+
+
+
+# springMVC 注解
+
+```java
+@RequestMapping()
+@ResponseBody  //告知SpringMVC框架 不进行视图跳转 直接进行数据响应
+
+```
+
+### requestParam
+
+```xml
+介绍
+	请求的参数名称与Controller的业务方法参数名称不一致时，就需要通过@RequestParam注解显示的绑定
+```
+
+
+
+# mybits 注解
+
+## 介绍
+
+```java
+基础
+	MyBatis 3 构建在全面且强大的基于 Java 语言的配置 API 之上。
+    它是 XML 和注解配置的基础。
+    注解提供了一种简单且低成本的方式来实现简单的映射语句。
+    
+缺点
+    但最强大的 MyBatis 映射并不能用注解来构建——我们真没开玩笑。
+    而 C# 属性就没有这些限制，因此 MyBatis.NET 的配置会比 XML 有更大的选择余地
+    
+注解总概述
+    https://mybatis.org/mybatis-3/zh/java-api.html#directoryStructure
+```
+
+## xml 配置
+
+```xml
+
+```
+
+
+
+## mapper  标签
+
+### select
+
+```java
+@Select	 方法	<select>	 
+功能
+    实现查询
+属性
+    value : sql语句
+@SelectProvider    方法	<select>	 实现查询
+```
+
+### update delete insert
+
+```java
+@Insert	 方法	<insert>	实现新增
+@Update	 方法	<update>	实现更新
+@Delete	 方法	<delete>	实现删除
+
+// 属性
+    value	: sql 语句
+// 例子
+	@Insert("insert into user values(#{id},#{username},#{password},#{birthday})")
+    public void save(User user);
+        	
+@InsertProvider	 方法	<insert>	实现新增
+@UpdateProvider	 方法	<update>	实现更新
+@DeleteProvider	 方法	<delete>	实现删除    
+
+```
+
+### resultMap
+
+
+
+#### 子元素
+
+##### constructor 
+
+```xml
+@ConstructorArgs 	方法 	<constructor>
+```
+
+##### association
+
+```JAVA
+@One 	N/A 	<association>
+    实现一对一结果集封装
+```
+
+##### collection
+
+```java
+@Many 	N/A 	<collection>
+    实现一对多结果集封装
+```
+
+
+
+##### id & result
+
+```java
+@Results	方法		 N/A
+    可以与@Result 一起使用，封装多个结果集
+    从版本 3.5.4 开始，该注解变为可重复注解。	
+//  使用格式
+    @Results（{
+    	@Result（），
+        @Result（）
+	}）
+
+@Result		N/A   	<result> <id>
+    	实现结果集封装 
+// 属性
+    id		一个布尔值，表示该属性是否用于唯一标识和比较对象
+    javaType	java 代码中的类
+    jdbcType
+    typeHandler
+    
+    column：数据库的列名
+    property：需要装配的属性名
+    one：需要使用的@One 注解（@Result（one=@One）（）））
+    many：需要使用的@Many 注解（@Result（many=@many）（））    
+```
+
+##### discriminator
+
+```java
+
+```
+
+
+

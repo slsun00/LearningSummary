@@ -1,0 +1,59 @@
+## 介绍
+
+```java
+介绍
+    // 就是使用组合处理类，一个类使用多个类，使用组合的方式
+    // 可以理解为工厂模式的升级版....
+    一个类使用组合的方式来处理多个类，将使用到的一些类，组合到一个类中，由这个组合的成品类进行类的管理
+    这个集中类，封装了要使用的类，就是一个门面，是所有使用到的类的外观
+```
+
+## 模式代码
+
+```java
+public class A {
+    public void showA(){
+        System.out.println("A 类");
+    }
+}
+
+public class B {
+    public void showB(){
+        System.out.println("B 类");
+    }
+}
+
+public class C {
+    public void showC(){
+        System.out.println("C 类");
+    }
+}
+
+// 门面，调用这几个类，需要组合这几个类
+public class Fade {
+    private  A a = new A();
+    private B b = new B();
+    private C c= new C();
+
+    public void need_1(){
+        this.a.showA();
+        this.b.showB();
+    }
+    public void need_2(){
+        this.a.showA(); 
+        this.c.showC();
+    }
+}
+
+
+// 测试
+public class Main {
+    public static void main(String[] args) {
+        Fade fade = new Fade();
+        fade.need_1(); // A 类 B 类
+        fade.need_2();  // A 类 C 类
+    }
+}
+
+```
+
