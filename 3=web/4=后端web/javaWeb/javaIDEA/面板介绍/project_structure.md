@@ -60,7 +60,10 @@ IDEA
 ```java
 是maven中的一个概念，表示某个module要如何打包，例如war exploded、war、jar、ear等等这种打包形式
 整合编译后的 java 文件，资源文件等
-Module 而言，有了 Artifact 就可以部署到 web 容器中    
+Module 而言，有了 Artifact 就可以部署到 web 容器中 
+    
+    
+    
 ```
 
 

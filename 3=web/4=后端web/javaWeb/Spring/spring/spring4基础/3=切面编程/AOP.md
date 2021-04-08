@@ -8,10 +8,11 @@
 	AOP 是 OOP 的延续
 （2）通俗描述：不通过修改源代码方式，在主干功能里面添加新功能
 特点 
+    // 对方法的增强 
     是函数式编程的一种衍生范型。
     利用AOP可以对业务逻辑的各个部分进行隔离，
 优势
-    在程序运行期间，在不修改源码的情况下对方法进行功能增强
+    在程序运行期间，在不修改源码的情况下, 将某段代码动态切入到指定方法的指定位置记性运行
     减少重复代码，提高开发效率，并且便于维护
 ```
 
@@ -42,15 +43,7 @@
 
 
 
-## 使用
-
-- 编写核心业务代码（目标类的目标方法）
-
-- 编写切面类，切面类中有通知(增强功能方法)
-
-- 在配置文件中，配置织入关系，即将哪些通知与哪些连接点进行结合
-
-## 实现切入点
+## 术语
 
 ### 基础
 
@@ -64,34 +57,39 @@
     概念
     	// 方法中增加的代码
     	实际增强的部分
-    分类
-    	前置通知 	before
-    	后置通知 	AfterReturning
-    	异常通知	AfterThrowing
-    	环绕通知	Around
-    	最终通知	After
 切面
 	是一个动作， 把通知应用到切入点过程            
 ```
 
-### 表达式
+### 切入点表达式
 
 ```java
 作用
-    知道对哪个类里面的哪个方法进行增强
+    // 表达式中是： 需要被增强的类的方法
+位置
+    对切面类中的方法进行标注，
+    表明切面类中的方法要增强的方法
 语法结构
     execution([权限修饰符] [返回类型] [类全路径] [方法名称]([参数列表]) )
-注意
-    权限修饰符： 可以省略
-    返回类型
-    	* 表示任何
-    类全路径
-    	包名.类名.方法名:  * 表示任何
-        包名、类名之间： 
-            一个点：表示当前包下的类
-            两个点：表示当前包及其子包下的类
-    参数
-    	两个点： 表示任意个数，任意类型的参数列表
+        权限修饰符： 
+    		可以省略
+        返回类型
+            * 表示任何，一个或者多个
+        类全路径
+            包名.类名.方法名:  * 表示任何
+            包名、类名之间： 
+                一个点：表示当前包下的类
+                两个点：表示当前包及其子包下的类
+        参数类型
+		   两边的括号是不能省略的                
+            两个点： 表示任意个数，任意类型的参数列表
+连接符
+	&&
+		要切入位置满足两边的表达式                
+	||
+		要切入位置满足其中一边               
+	|                
+		只要不是这个位置就都切入                
 例子
     // 对 com.atguigu.dao.BookDao 类里面的 add 进行增强
     execution(* com.atguigu.dao.BookDao.add(..))
@@ -105,35 +103,25 @@ execution(* com.itheima.aop..*.*(..))
 execution(* *..*.*(..))
 ```
 
-## 通知
-
-### 介绍
+### 通知
 
 ```java
-    概念
-    	// 方法中增加的代码
-    	实际增强的部分
-    分类
-    	前置通知 	before
-    	后置通知 	AfterReturning
-    	异常通知	Throwing
-    	环绕通知	Around
-    	最终通知	After
-语法
-	<aop:通知类型 method=“切面类中方法名” pointcut=“切点表达式"></aop:通知类型>
+概念
+    // 方法中增加的代码
+    实际增强的部分
+分类	
+		     xml 标签        			   注解				含义
+前置通知 	<aop:before>			     @Before			方法执行前执行
+后置通知 	<aop:after-returning>		 @AfterReturning	  方法执行后执行
+异常通知	<aop:throwing>				@Throwing			方法有异常执行
+环绕通知	<aop:around>				@Around				方法执行前后都会执行
+最终通知	<aop:after>					@After			    方法无论怎样，执行后都会执行
+       
 ```
 
-### xml 通知
+![image-20210326145039625](image-20210326145039625.png)
 
-![图片5](%E5%9B%BE%E7%89%875.png)
-
-### 注解通知
-
-![图片7](%E5%9B%BE%E7%89%877.png)
-
-## xml开发
-
-### 基础
+## 使用
 
 ```java
 介绍
@@ -143,6 +131,19 @@ execution(* *..*.*(..))
 使用方式
     （1）基于 xml 配置文件实现
 	（2）基于注解方式实现（使用）
+步骤
+    编写核心业务代码（目标类的目标方法）
+	编写切面类，切面类中有通知(增强功能方法)
+	在配置文件中，配置织入关系，即将哪些通知与哪些连接点进行结合
+    
+```
+
+## xml开发
+
+### 介绍
+
+```java
+
 引用依赖
     aspects --> springsource(net.sf.cglib; org.aopalliance; aspectj.weaver)
     aop
@@ -154,27 +155,24 @@ execution(* *..*.*(..))
     
 代理方式使用
     框架会根据目标类是否实现了接口来决定采用哪种动态代理的方式。
-```
-
-### 快速入门
-
-```java
-①导入 AOP 相关坐标
-
-②创建目标接口和目标类（内部有切点）
-
-③创建切面类（内部有增强方法）
-
-④将目标类和切面类的对象创建权交给 spring
-
-⑤在 applicationContext.xml 中配置织入关系
-
-⑥测试代码
+    
+步骤
+	导包    
+		导入 AOP 相关坐标
+    java 代码
+    	1. 目标接口、目标类（内部有切点）
+		2. 切面类（内部有增强方法）
+	bean.xml 
+		目标类和切面类的对象创建权交给 spring , 配置织入关系
+	测试代码   
+    	测试要从 xml 中找到 bean 实例
+语法
+	<aop:通知类型 method=“切面类中方法名” pointcut=“切点表达式"></aop:通知类型>    
 ```
 
 ### 配置
 
-#### 坐标
+#### 导包
 
 ```xml
 <!--导入spring的context坐标，context依赖aop-->
@@ -204,7 +202,7 @@ execution(* *..*.*(..))
 <bean id="myAspect" class="com.itheima.aop.MyAspect"></bean>
 <!--织入-->
 <aop:config>
-    <!--引用myAspect的Bean为切面对象-->
+    <!--指定切面类：引用myAspect的Bean为切面对象-->
     <aop:aspect ref="myAspect">
         <!--配置Target的method方法执行时要进行myAspect的before方法前置增强-->
         <aop:before method="before" pointcut="execution(public void com.itheima.aop.Target.method())"></aop:before>
@@ -213,7 +211,7 @@ execution(* *..*.*(..))
 </aop:config>
 ```
 
-### 切点表达式提取
+#### 切点表达式提取
 
 ```xml
 介绍
@@ -231,40 +229,75 @@ execution(* *..*.*(..))
 
 
 
-
-
-## 注解开发
-
-### 使用
+### java 代码
 
 ```java
-创建目标接口和目标类（内部有切点）
-
-创建切面类（内部有增强方法）
-
-将目标类和切面类的对象创建权交给 spring
-
-在切面类中使用注解配置织入关系
-// z注意开启
-在配置文件中开启组件扫描和 AOP 的自动代理
-
-测试
-
+正常的代码，不需要进行注解什么的， 跟平时的 java 项目代码一样
 ```
 
 
 
-### 基础
+## 注解开发
+
+### 介绍
 
 ```java
+步骤
+	导包    
+		导入 AOP 相关坐标
+    java 代码
+    	1. 目标接口、目标类（内部有切点）
+		2. 切面类（内部有增强方法）
+    	// 重要 ： 切面类中使用注解配置织入关系
+    	3. 
+	bean.xml 
+		开启组件扫描和 AOP 的自动代理
+	测试代码   
+```
 
+
+
+### 快速入门
+
+#### 导包
+
+#### xml配置
+
+```java
+xml 配置
+ xmlns:context="http://www.springframework.org/schema/context" 
+ xmlns:aop="http://www.springframework.org/schema/aop" 
+  xsi:schemaLocation="http://www.springframework.org/schema/beans 
+        http://www.springframework.org/schema/beans/spring-beans.xsd 
+         http://www.springframework.org/schema/context 
+        http://www.springframework.org/schema/context/spring-context.xsd 
+         http://www.springframework.org/schema/aop 
+        http://www.springframework.org/schema/aop/spring-aop.xsd" 
+
+<!--组件扫描-->
+<context:component-scan base-package="com.itheima.aop"/>
+
+<!--aop的自动代理-->
+<aop:aspectj-autoproxy></aop:aspectj-autoproxy>
+ 
+```
+
+#### java 代码
+
+##### 目标类
+
+```java
 @Component
 public class User {
     public void add(){
         System.out.println("user");
     }
 }
+```
 
+##### 切面类
+
+```java
 @Component("userProxy")
 @Aspect  //生成代理对象，增强的类，来增强其他类的方法
 public class UserProxy {
@@ -300,30 +333,33 @@ public class UserProxy {
 }  
 ```
 
-### 配置
 
-#### xml配置
+
+### 被增强方法信息
 
 ```java
-xml 配置
- xmlns:context="http://www.springframework.org/schema/context" 
- xmlns:aop="http://www.springframework.org/schema/aop" 
-  xsi:schemaLocation="http://www.springframework.org/schema/beans 
-        http://www.springframework.org/schema/beans/spring-beans.xsd 
-         http://www.springframework.org/schema/context 
-        http://www.springframework.org/schema/context/spring-context.xsd 
-         http://www.springframework.org/schema/aop 
-        http://www.springframework.org/schema/aop/spring-aop.xsd" 
-
-<!--组件扫描-->
-<context:component-scan base-package="com.itheima.aop"/>
-
-<!--aop的自动代理-->
-<aop:aspectj-autoproxy></aop:aspectj-autoproxy>
- 
+介绍
+    获取被增强的类（连接点）的方法的信息： 参数、名称
+    使用 JoinPoint
+    // 参数不能乱写，需要提前告诉 spring 每个参数的含义是什么
+    // 类型不固定，尽量往大了写
+返回值
+    标签属性 returnning
+    @AfterReturning(value="execurion(...)", returnning="result")
+    public static void logReturn(JointPoint jointPoint, Object result){
+    	return result
+	}
+异常返回
+    标签属性 throwing
+    @Throwing(value="execurion(...)", throwing="exception")
+        public static void logReturn(JointPoint jointPoint, Exception exception){
+    	return result
+	}
 ```
 
-#### 完全注解
+![image-20210326130123137](image-20210326130123137.png)
+
+### 完全注解
 
 ```java
 // 创建配置类，不需要创建 xml 配置文件 
@@ -374,7 +410,7 @@ public void before() {
 
 
 
-### 多增强类
+### 多切面类
 
 ```java
 介绍
@@ -386,5 +422,8 @@ public void before() {
 @Aspect
 @Order(1)
 public class PersonProxy
+    
+// 执行顺序： 需要验证    
 ```
 
+![image-20210326153259480](image-20210326153259480.png)

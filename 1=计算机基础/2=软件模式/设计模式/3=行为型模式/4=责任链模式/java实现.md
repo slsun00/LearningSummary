@@ -6,9 +6,10 @@
 
 ## 模式代码
 
-### 复杂
+### 纯抽象类
 
 ```java
+// 类接口
 public abstract class Handler {
     // 责任链设置
     public abstract  void setNextHandler(Handler handler);
@@ -64,7 +65,7 @@ public class GroupLeader extends Handler {
 
 ```
 
-### 精简
+### 抽象类
 
 ```java
 public abstract class Handler {

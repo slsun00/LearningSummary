@@ -3,6 +3,11 @@
 ## SqlSession工厂对象
 
 ```java
+特点
+    SqlSession 的实例不是线程安全的，因此是不能被共享的。
+    SqlSession每次使用完成后需要正确关闭，这个关闭操作是必须的
+    SqlSession可以直接调用方法的id进行数据库操作，
+    但是我们一般还是推荐使用SqlSession获取到Dao接口的代理类，执行代理对象的方法，可以更安全的进行类型检查操作
 介绍
     // 通过加载mybatis的核心文件的输入流的形式构建一个SqlSessionFactory对象
     String resource = "org/mybatis/builder/mybatis-config.xml"; 

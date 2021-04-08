@@ -636,13 +636,27 @@ public class MyBeanPost implements BeanPostProcessor {
     		 <property name="username" value="${prop.userName}"></property>
     		 <property name="password" value="${prop.password}"></property>
     	</bean>
-外部文件
+外部文件	           
+    // jdbc.properties            
+    prop.driverClass=com.mysql.jdbc.Driver 
+    prop.url=jdbc:mysql://localhost:3306/userDb 
+    prop. userName=root 
+    prop. password=root      
+        
+其他
+// 调用静态方法
+    UUID.randomUUID().tostring()
+    #{T(全类名).静态方法(参数1，参数2)}        
+        <property 
+            name="email" 
+            value="${T(java.util.UUID).randomUUID().toString().subString(0,5)}"
+         ></property>
             
-// jdbc.properties            
-prop.driverClass=com.mysql.jdbc.Driver 
-prop.url=jdbc:mysql://localhost:3306/userDb 
-prop. userName=root 
-prop. password=root            
+// 非静态方法 ，对象.方法名（）     
+      <property 
+        name="gneder" 
+        value="${T(book.getPersonAge()}"
+      ></property>    
 ```
 
 
@@ -665,23 +679,14 @@ prop. password=root
 #### xml 配置
 
 ```java
-命名空间  ： context
-    
-    
-引入 jar 包
-    spring-aop-5.2.6.RELEASE.jar
-注意
-    // 如果扫描多个包，多个包使用逗号隔开; 扫描包上层目录
+
+// 标签含义： 参看spring 标签 的 context 系列
+       
+果扫描多个包，多个包使用逗号隔开; 扫描包上层目录
 
 // 开启组件扫描
-    <context:component-scan base-package="com.atguigu">
-    </context:component-scan>     
-    
-作用
-    指定哪个包及其子包下的Bean需要进行扫描以便识别使用注解配置的类、字段和方法。
-精细扫描
-    use-default-filters="false" 表示现在不使用默认 filter，自己配置 filter
-	context:include-filter ，设置扫描哪些内容
+    <context:component-scan base-package="com.atguigu"></context:component-scan> 
+
     
 // 到 atguigu 中，只扫描带有 expresstion 中到有controller 的类    
 <context:component-scan base-package="com.atguigu" use-default-filters="false">
@@ -733,10 +738,18 @@ public void testService2() {
     @Service		使用在service层类上用于实例化Bean
     @Controller		使用在web层类上用于实例化Bean
     @Repository    	 使用在dao层类上用于实例化Bean
-语法格式
+特点
+1、组件 id ,默认是组件类名的首字母小写
     <bean id="userService" class=".."/>
-    @Service(value = "userService")
-    @service    // 默认值是类名称，首字母小写
+     // 默认值是类名称，首字母小写   
+     @service   
+     // 自定义组件id 
+     @Service(value = "userService")  === @Service("userService")
+    
+2、 作用域， 默认单例    
+	@Scope(value="prototype")
+
+      
 ```
 
 #### 无参构造
@@ -807,18 +820,41 @@ public void testService2() {
 #### 介绍
 
 ```java
+介绍
+    使用注解不需要进行设置 set get 方法
 @Autowired：
-    使用在字段上用于根据属性类型进行自动装配，
-    按照数据类型从 spring 容器中匹配
-@Qualifier()：
-    根据名称进行注入， 结合@Autowired一起使用
-    按照 id 值从容器中进行匹配
-@Resource()： 
-    按照名称进行注入， 相当于@Autowired+@Qualifier 
-    可以根据类型注入，可以根据名称注入   
+    1. 属性类型进行自动装配,
+		// 找到多个在进行 id 匹配
+		找到就赋值，找不打就报错
+	2. 按照变量名作为 id 继续匹配装配   
+		// 找到多个，就需要再设置 qualifier            
+         找到就赋值， 找不到就报错 
+     3. 使用在方法上
+            // 尽管使用在方法上，对参数进行装配还是符合 1 、2
+            bean 创建的时候，会自动运行该方法
+            为每一个参数都会自动注入值      
+    语法例子
+    	@Autowired
+    	private User user
+    	user = ioc.getBean(User.class)
+            
+@Qualifier("")：
+	// 需要结合 @Autowired一起使用            
+	指定一个名字作为 id , 进行匹配 ， spring则不使用 变量名作为id
+
+@Resource("")： 
+	// 等价于  @Autowired+@Qualifier            
+    指定一个名字作为 id , 进行匹配 ， spring则不使用 变量名作为id
+    可以根据类型注入，可以根据名称注入  
+            
+@Inject
+	自动装配            
 @Value：  
     注入普通类型属性    
-    
+
+区别
+	@Autowired	spring 自己的注解
+	@Resource	j2ee   java的标准， 扩展性强，            
     
 语法格式
     <bean id="userService" class=".."/>
@@ -886,6 +922,7 @@ private String name;
 ```java
 @Configuration	
 	用于指定当前类是一个 Spring 配置类，当创建容器时会从该类上加载注解
+	该标注的类        
 @Import	用于导入其他配置类    
 ```
 
@@ -927,5 +964,5 @@ private String name;
     
 ```
 
-
+## 泛型注入
 

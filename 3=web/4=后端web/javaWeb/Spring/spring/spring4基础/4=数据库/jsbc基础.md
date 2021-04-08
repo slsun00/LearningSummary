@@ -1,6 +1,6 @@
 ## JdbcTemplate
 
-### 基础
+## 介绍
 
 ```java
 介绍
@@ -12,37 +12,62 @@
     操作消息队列的JmsTemplate等等。
 
 使用步骤
-    导入spring-jdbc和spring-tx坐标
+    导包
+    	导入spring-jdbc和spring-tx坐标
+         druid connector	jdbc	orm	tx 
     创建数据库表和实体
     创建JdbcTemplate对象
     执行数据库操作
-```
-
-
-
-## 基础
-
-```java
-介绍
-	Spring 框架对 JDBC 进行封装，使用 JdbcTemplate 方便实现对数据库操作
-引包
-    druid connector	jdbc	orm	tx
     
+       
 ```
+
+
 
 ## 连接数据库
 
-### 配置
+```java
+数据连接配置
+```
+
+## 数据库操作
+
+### sql语句
 
 ```java
-数据源配置
+具名参数
+    介绍
+    	具有名字的参数   
+    例子
+    	String sql = "insert into t_book(salary) values(:salary)
+    	
+占位符参数
+    问题
+    	？ 的顺序不能乱，否咋出错
+    例子
+    	String sql = "insert into t_book values(?,?,?)"
 ```
 
 
 
-### java
+### 增删改
+
+#### 介绍
 
 ```java
+单个操作	update
+批量操作	batchUpdate    
+    
+     @Autowired
+     private JdbcTemplate jdbcTemplate;  // 是可以自动注入的    
+```
+
+#### 单个操作
+
+```java
+介绍
+    如果是单个操作，就不用
+
 @Service
 public class BookService {
      //注入 dao
@@ -60,6 +85,8 @@ public class BookDaoImpl implements BookDao {
      public void add(Book book) {
          //1 创建 sql 语句
          String sql = "insert into t_book values(?,?,?)";
+         
+         
          Object[] args = {book.getUserId(), book.getUsername(),  book.getUstatus()};
          //2 调用方法实现
          	// 第一个参数：sql 语句
@@ -74,43 +101,92 @@ public class BookDaoImpl implements BookDao {
 "delete from account where name=?","tom"    
 ```
 
-### 方法
+#### 批量操作
+
+```java
+public void test03(){
+    String sq1 ="INSERT INTO employee ( emp_ name , salary) VALUE (?,?)
+    // batchUpdate (String sq1, List<0bject]> batchArgs,)
+    // List<object[]>  List的长度就是sql语句要执行的次数
+    // Object[]:每次执行要用的参数
+    List<Object[]> batchArgs = new ArrayList<Object[]>();
+    batchArgs.add(new 0bject[]{"张三" ,998.98});
+    batchArgs.add(new 0bject[]{"李四" ,998.98});
+    jdbcTemplate.batchUpdate( sql，batchArgs) ;
+}
+
+```
+
+
+
+### 查
+
+#### 基础
 
 ```java
 // JdbcTemplate 实现查询返回某个值代码 
 queryForObject(String sqlString, Class<T> requireType)
-    // Long count = jdbcTemplate.queryForObject("select count(*) from account", Long.class);
+    // Long count = jdbcTemplate.queryForObject(sqlSring, Long.class);
      第一个参数：sql 语句
 	 第二个参数：返回类型 Class
  
-// （查询返回对象）
-queryFor0b. ject(String sql, RowMapper<T> rowMapper, 0bject... args)   
+// （查询返回对象： java 对象）
+queryFor0bject(String sql, RowMapper<T> rowMapper, 0bject... args)  
+    String sqlString = "SELECT emp_ id empId, emp_ name empName, salary FROM employee WHERE salary>? "
     // Book book = jdbcTemplate.queryForObject(sql, new BeanPropertyRowMapper<Book>(Book.class), id);
-    第一个参数：sql 语句
-    第二个参数：RowMapper 是接口，针对返回不同类型数据，使用这个接口里面实现类完成数据封装
-    第三个参数：sql 语句值   
+    第一个参数：
+    	sql 语句
+    第二个参数：
+    	RowMapper 是接口，针对返回不同类型数据，使用这个接口里面实现类完成数据封装
+    	每一行记录和 javaBean 的属性如何映射
+    第三个参数：
+    	sql 语句值   
+    结果
+    	查询不到就会报错，所以需要进行处理， 
 // 查询返回集合    
 query (String sq1, RowMapper<T> rowMapper, 0bject... args)
     // List<Book> bookList = jdbcTemplate.query(sql, new BeanPropertyRowMapper<Book>(Book.class));
 	第一个参数：sql 语句
-	第二个参数：RowMapper 是接口，针对返回不同类型数据，使用这个接口里面实现类完成数据封装
+	第二个参数：
+    	RowMapper 是接口，针对返回不同类型数据，使用这个接口里面实现类完成数据封装
+    	封装list, 集合里面元素的类型
 	第三个参数：sql 语句值    
     
-// 实现批量添加操作
-batchUpdate (String sq1, List<0bject]> batchArgs,)
-    第一个参数：sql 语句
-	第二个参数：List 集合，添加多条记录数据
+
+```
+
+### 具名参数
+
+```java
 例子
-    List<Object[]> batchArgs = new ArrayList<>();
-        Object[] o1 = {"3","java","a"};
-        Object[] o2 = {"4","c++","b"};
-        Object[] o3 = {"5","MySQL","c"};
-        batchArgs.add(o1);
-        batchArgs.add(o2);
-        batchArgs.add(o3);
+   String sql = "insert into t_book(salary) values(:salary)
     
-     String sql = "insert into t_book values(?,?,?)";
-     int[] ints = jdbcTemplate.batchUpdate(sql, batchArgs);
-     System.out.println(Arrays.toString(ints));
+    
+ // bean.xml , 配置具名参数的类
+<bean id="" class="org.springframework.jdbc.core.namedparam.NamedParameterIdbcTemplatel"> 
+	// 构造器的方式注入一个数据源
+    <constructor-arg name="dataSource" ref="dataSource"></constructor-arg>
+</bean> 
+    
+// java
+    NamedParameterIdbcTemplatel nameJdbcTemplate = 
+        ioc.getBean(NamedParameterIdbcTemplatel.class);
+	// -----------------------------------------------------------
+    String sql = "insert into t_book(salary) values(:salary)" ;
+    //Map
+    Map<String，Object> paramMap = new HashMap<>() ;
+    //将所有具名参数的值都放在map中;
+    paramMap. put("salary", "田七");
+
+    nameJdbcTemplate.update(sql, paramMap)
+ 	// -----------------------------------------------------------       
+	String sq1 = "INSERT INTO employee( emp_ name, salary) VALUES(:empName)
+    Employee employee = new Employee( );
+    employee. setEmpName( "哈哈");
+
+	// SqlParameterSource形式传入参数值
+	namedIdbcTemplate.update(
+        sq1, new BeanPropertySqlParameterSource (employee))
+        
 ```
 

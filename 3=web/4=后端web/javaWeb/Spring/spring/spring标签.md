@@ -238,20 +238,30 @@ autodetect值：
 
 ## aop系列
 
-```xml
+### config
+
+```dtd
 
 <!ELEMENT aop:config
 子表签(
 	aop:pointCut
+    	复用的pointcut语句
 	aop:aspect
+    	切面配置，切面织入
+)
+属性(
+		
 )>
 
 <!ELEMENT aop:aspect
 子表签(
+	// 四个标签： before after after-returning throwing round
 	aop:before
 )
 属性(
-	ref
+	ref  指定切面类
+    returning  after-returning独有的属性，返回值
+    throwing   throwing 独有的属性，抛出的错误类型的参数
 )>
 
 <!ELEMENT aop:before
@@ -259,9 +269,9 @@ autodetect值：
 	
 )
 属性(
-	mehtod
-	pointcut
-	aop:pointCut-ref
+	mehtod	进行增强的方法
+	pointcut	需要被增强的方法
+	aop:pointCut-ref	复用的别增强的方法
 )>
 
 <!--配置目标类-->
@@ -292,54 +302,65 @@ autodetect值：
 
 ## context  系类
 
-##### component-scan
+### component-scan
 
 ```dtd
-context:component-scan
-	spring可以自动去扫描base-pack下面或者子包下面的java文件，
-	如果扫描到有@Component @Controller@Service等这些注解的类，则把这些类注册为bean
+<!ELEMENT context:component-scan
+属性(
+     base-package:
+    	// 类全路径
+        指定扫描的基础包,
+        将包下面的所有包中加了注解的类，自动扫描入 ioc 容器
+     use-default-filters="false" 
+           false 表示不适用默认的，启用 context:xxx-filter 子标签
+           true  使用默认的过滤器， 将 component 等注释的标签注册为 bean
+        表示现在不使用默认 filter，使用自己配置 filter
+)
+字标签(
+     context:include-filter
+         指定扫描那些包，默认扫描全部
+     context:exclude-filter 
+    	指定不扫描哪些
+)>
 
-<!--context:component-scan-->
-<!ELEMENT scontext:component-scan (context:include-filte?, context:exclude-filter)>
-<!ELEMENT context:include-filter (#PCDATA)>
-	<!--include-filter
-		指定扫描那些
-	-->
-<!ELEMENT context:exclude-filter (#PCDATA)>
-	<!--exclude-filter
-		指定不扫描哪些
-	-->
 
-<!--------------------------------------------------------------------------------->
-<!ATTLIST scontext:component-scan
-	base-package 		包名		自动扫描的类
-    <!--	
-         告诉spring要扫描的包
-      -->
-	use-default-filters	 boolean   是否是使用默认的 filter
-    <!--	
-       false 表示不适用默认的，启用 context:xxx-filter 子标签
-       true  使用默认的过滤器， 将 component 等注释的标签注册为 bean
-      -->
->
 
 <!ATTLIST context:include-filter， context:exclude-filter
 	type 	固定的几个值    扫描规则
     expression	type的具体规则  规则表达式
 >
 <!-- type -->
+//----------------------------------------------------------------
+type="filter"： 
+rexpression：
+//----------------------------------------------------------------
+type="annotation"： 指定按照注解： 
+rexpression： 注解的全类名
+	// 排除掉含有 @Controller 标签的类
+    <context:exclude-filter 
+        type="annotation" 
+		// 类全名
+        expression="org.springframework.stereotype.Controller"
+    />
+//----------------------------------------------------------------
+type="assignable"： 排除某个具体的类，按照类排除 
+rexpression： 类的全名
+//----------------------------------------------------------------
+type="aspectj"： 排除符合 aspectj 表达式的
+rexpression： aspectj 表达式
+//----------------------------------------------------------------
+type="custom"： 
+	自定义一个 TypeFilter , 自己写代码决定哪些类使用
+rexpression： aspectj 表达式
+//----------------------------------------------------------------
+type="regex"： 
+	正则表达式
+rexpression： 正则表达式
+//----------------------------------------------------------------
 Filter			 
 	Type							
 	Examples Expression	Description
-annotation		
-	org.example.SomeAnnotation		 
-	滤器扫描使用注解所标注的那些类，通过expression属性指定要扫描的注释
-assignable		
-	org.example.SomeClass			
-	过滤器扫描 派生于expression属性所指定类型的那些类
-aspectj			
-	org.example..*Service+			
-	过滤器扫描与 expression属性 所指定的AspectJ表达式所匹配的那些类
+
 regex			
 	org.example.Default.*			
 	使用自定义的org.springframework.core.type.TypeFliter实现类，该类由expression属性指定
@@ -348,69 +369,150 @@ custom
 	Spring3新增自订Type,称作org.springframework.core.type.TypeFilter
 ```
 
+
+
+## tx系列
+
+### 概述
+
+```dtd
+<!--2 配置通知, 事务增强， --> 
+<tx:advice>
+     <!--配置事务参数-->
+     <tx:attributes>
+         <!--指定哪种规则的方法上面添加事务-->
+         <tx:method/>
+         <!--<tx:method name="account*"/>-->
+     </tx:attributes>
+</tx:advice>
+```
+
+
+
+### advice
+
+```dtd
+<!ELEMENT tx:advice
+含义()
+属性(
+	id="txadvice"
+)
+子标签(
+	tx:attributes
+)
+>
+```
+
+### attributes
+
+```dtd
+<tx:attributes>
+```
+
+
+
+### method
+
+```dtd
+<!ELEMENT tx:method 
+含义(
+	一个该标签一个事务
+)
+属性（
+    name="transfer" 
+    	实现切点方法名称
+    isolation="REPEATABLE_READ" 
+    	事务的隔离级别
+    propagation="REQUIRED" 
+    	事务的传播行为
+    timeout="-1" 
+    	超时时间
+    read-only="false"
+    	是否只读
+）    
+/>
+ 
+
+```
+
+
+
 # mvc系列
 
-##### annotation
+## annotation-driven
 
-```xml
-mvc:annotation-driven
-<!ELEMENT mvc:annotation-driven>
-	<!-- mvc 的注册驱动 -->
-<!ATTLIST mvc:annotation-driven
+```dtd
+<!ELEMENT  mvc:annotation-driven
+含义(
+	mvc 的注册驱动
+    会自动注册 
+    	RequestMappingHandlerMapping、
+    	RequestMappingHandlerAdapter、
+    	ExceptionHandlerExceptionResolver 三个bean。
+    同时支持使用
+    	ConversionService 实例对表单参数进行类型转换
+    	@NumberFormat annotation、@DateTimeFormat 注解完成数据类型的格式化
+    	@Valid 注解对 JavaBean 实例进行 JSR 303 验证
+    	@RequestBody 和 @ResponseBody 注解
+)
+属性(
 	conversion-service	自定义的转化器的 name, 使用注定的转换器进行类型转换
->
+)>
 
 语法例子
     <mvc:annotation-dirven/>
 ```
 
-##### resources
+## resources
 
-```xml
+```dtd
 mvc:resources
-<!ELEMENT mvc:resources >  
-<!--  开发资源的访问
--->
-<!ATTLIST scontext:component-scan
+<!ELEMENT mvc:resources
+含义(
+    
+)
+属性(
 	mapping 		映射地址，往服务端发送请求资源的地址
     location		开放的具体的资源的目录地址
->    
+)>  
+
     
 例子
     <mvc:resources mapping="/jsp/**" location="/js/">
     <mvc:resources mapping="/img/**" location="/img/">
 ```
 
-##### default-servlet-handler
+## default-servlet-handler
 
-```xml
-<!ELEMENT >
-<!ELEMENT mvc:default-servlet-handler >
-<!--  在访问资源的时候，springMVC 寻找相应的匹配地址，
-	找不到， 就交由原始的容器（tomcat）寻找
--->
+```dtd
+<!ELEMENT mvc:default-servlet-handler
+含义(
+	在访问资源的时候，springMVC 寻找相应的匹配地址
+    找不到， 就交由原始的容器（tomcat）寻找
+)>
 
 例子
 	<mvc:default-servlet-handler/>
+
+注意
+	mvc:default-servlet-handler 和 mvc:annotation-driven
+	都没配置
+	
 ```
 
-##### interceptors
+## interceptors
 
-```xml
-<!ELEMENT mvc:interceptors(mvc:interceptors*)>
+```dtd
 
 <!ELEMENT mvc:interceptor(
+含义(
+	
+)
+子标签(
+    mvc:interceptors*
 	mvc:mapping,  <!--对哪些资源进行拦截操作-->
 	bean		 <!--要执行拦截操作的类的实例-->
 )>
-
-
-<!ELEMENT mvc:mapping>
-
-
-<!ALLIST mvc:mapping
-	path	
->
 
 <!--配置拦截器-->
     <mvc:interceptors>
@@ -420,6 +522,14 @@ mvc:resources
             <bean class="com.itheima.interceptor.MyInterceptor1"/>
         </mvc:interceptor>
     </mvc:interceptors>
+```
+
+## mapping
+
+```dtd
+<!ELEMENT mvc:mapping
+	path	
+>
 ```
 
 
@@ -501,8 +611,6 @@ myBatis 只有两个标签
 	driver 和 url 属性将会由 jdbc.properties 文件中对应的值来替换
 ```
 
-![image-20210315123510997](C:/Users/11940/AppData/Roaming/Typora/draftsRecover/image-20210315123510997.png)
-
 ### 默认值设置
 
 ```java
@@ -538,8 +646,9 @@ myBatis 只有两个标签
 
 ## settings
 
-```xml
+```dtd
 介绍
+	极为重要的属性
 	改变 MyBatis 的运行时行为
 注意
 	属性偏多，用到那个用哪个，暂时没必要所有的都过一遍，
@@ -547,37 +656,55 @@ myBatis 只有两个标签
 <!ELEMENT settings
 子元素(
 	setting
+)
+属性(
+name
+    mapUnderscoreToCamelCase  
+    	是否开启驼峰命名规则，会将 A_COLUMN 自动映射为 aCloumn, 
+    lazyLoadingEnable  false
+    	开启延迟加载开关
+    aggressiveLazyLoading true
+    	启用，会完整加载有延迟属性的对象，反之每种属性按需加载
+value
+
 )>
 
-<!ELEMENT setting
-属性(
-	name
-	value
-)>
 ```
 
 ## typeAliases
 
-```xml
+```dtd
 介绍
 	类型别名可为 Java 类型设置一个缩写名字。 它仅用于 XML 配置，意在降低冗余的全限定类名书写
 	可以设置一个别名组， 专门用于设置别名使用
 语法例子
-	<!ELEMENT typeAliases
-	子元素(
-		typeAliases	单个别名实例
-		package	定一个包名，MyBatis 会在包名下面搜索需要的 Java Bean
-	)
-	属性(
-		alias   别名
-		type	原始的类型
-	)>
-介绍
+<!ELEMENT typeAliases
+使用(
+	不推荐使用，直接使用全类名
+)    
+子元素(
+    typeAliases	为一个 javaBean 起别名，别名默认为类名，不区分大小写
+    package  给包的下面的所有类起别名，默认类名	
+    	定一个包名，MyBatis 会在包名下面搜索需要的 Java Bean
+)
+属性(
+    alias   别名
+    type	原始的类型
+)>
+
+
+语法例子
 	<typeAliases>
        <!-- 在使用 domain.blog.Author 的地方，都可以使用 Author 来替代-->
 	  <typeAlias alias="Author" type="domain.blog.Author"/>
        <package name="domain.blog"/>
 	</typeAliases>
+
+```
+
+### 注意
+
+```java
 注意
 	常见的 Java 类型内建的类型别名。它们都是不区分大小写的，注意，
 	为了应对原始类型的命名重复，采取了特殊的命名风格
@@ -589,7 +716,7 @@ myBatis 只有两个标签
 
 ### 介绍
 
-```xml
+```dtd
 介绍
 	类处理器, 数据类型的转换
     无论是 MyBatis 在预处理语句（PreparedStatement）中设置一个参数时，还是从结果集中取出一个值时， 
@@ -601,11 +728,16 @@ myBatis 只有两个标签
 
 
 语法例子
-<typeHandlers 
-	注册类处理器，处理数据库和实体之间的类型转换的类型处理器              
+<!ELEMENT typeHandlers 
+含义(
+	注册类处理器，处理数据库和实体之间的类型转换的类型处理器   
+)
+               
 子标签（
 	typeHandler                   	
 ）>
+
+
 <!ELEMENT typeHandler
 属性(
 	handler
@@ -613,8 +745,6 @@ myBatis 只有两个标签
 )>
     
 例子
-
-   
 ```
 
 ### 自定义处理器
@@ -688,17 +818,15 @@ myBatis 只有两个标签
 
 ## plugins
 
-### 基础
-
-```java
-介绍
-    使用第三方的插件来对功能进行扩展
-    
- 
-<plugins(
+```dtd
+<!ELEMENT plugins(
+含义(
+	使用第三方的插件来对功能进行扩展	
+)    
 子元素(
 	plugin,
 )>  
+
 <peoperties
 属性(
 	name
@@ -707,52 +835,11 @@ myBatis 只有两个标签
     
         
 例子
-// java 代码
-    
-    
-    
     <!-- 注意：分页助手的插件  配置在通用馆mapper之前 -->
     <plugin interceptor="com.github.pagehelper.PageHelper">
         <!-- 指定方言 -->
         <property name="dialect" value="mysql"/>
     </plugin>
-```
-
-### 自定义插件
-
-```java
-介绍
-    使用插件是非常简单的，只需实现 Interceptor 接口，并指定想要拦截的方法签名即可
-
-例子
-    // ExamplePlugin.java
-@Intercepts({
-    @Signature(
-	  type= Executor.class,
-	  method = "update",
-  	  args = {MappedStatement.class,Object.class}
-    )
-})
-    
-public class ExamplePlugin implements Interceptor {
-  private Properties properties = new Properties();
-  public Object intercept(Invocation invocation) throws Throwable {
-    // implement pre processing if need
-    Object returnObject = invocation.proceed();
-    // implement post processing if need
-    return returnObject;
-  }
-  public void setProperties(Properties properties) {
-    this.properties = properties;
-  }
-}
-
-<!-- mybatis-config.xml -->
-<plugins>
-  <plugin interceptor="org.mybatis.example.ExamplePlugin">
-    <property name="someProperty" value="100"/>
-  </plugin>
-</plugins>
 ```
 
 
@@ -761,38 +848,48 @@ public class ExamplePlugin implements Interceptor {
 
 ## environments
 
-```xml
-<environments 
+```dtd
+介绍
+	这个标签只要是利用 spring 进行配置的，mybatis 基本只用来进行增删改查
+<!ELENENT environments 
 子标签 (
 	environment  环境变量
 )
 属性(
-	default="development"  指定默认的环境名称,使用的默认值
+	default="development"  
+    	指定默认的环境名称,使用的默认值，
 )>
 
-
-<environment 
+<!ELEMENT environment 
+介绍(
+	配置一个具体的环境，需要一个事务管理器和一个数据源
+    可以设置多个化境，
+)    
 子标签(
+    这两个子标签，随后都不会用，直接用 spring 的进行，mybatis 只进行增删改查
     transactionManager   事务管理，事务类型
     dataSource	数据源，连接池
-
 )
 属性（
  	id="development"	
-        指定当前环境的名称
+        指定当前环境的名称唯一标识，
+    	可以使用 environments 的 default 标签设置当前使用的数据库
+    
 ）>
-<transactionManager   
+
+<!ELEMENT transactionManager   
 属性(
 	type="JDBC"  事务管理器，事务管理的类型
 )>
-< dataSource   子标签数据都是固定的
+<!ELEMENT dataSource   子标签数据都是固定的
 子标签 (
     property	数据源配置的基本参数	
 ) 属性 (
-    type="POOLED"   指定当前数据源类型是链接池
-)
->
-< property   子标签数据都是固定的
+    type="POOLED"   
+    	指定当前数据源类型是链接池,
+        当前自定义连接池的全类名
+)>
+<!ELEMENT property   子标签数据都是固定的
 子标签 (
     property	数据源配置的基本参数	
 ) 属性 (
@@ -800,7 +897,6 @@ public class ExamplePlugin implements Interceptor {
 	value          
 )    
 
-    
         <environment id="development">           
             <transactionManager type="JDBC"/>            
             <dataSource type="POOLED">
@@ -812,15 +908,38 @@ public class ExamplePlugin implements Interceptor {
         </environment>
 ```
 
+## databaseIdProvider
+
+```dtd
+介绍
+	考虑数据库的移植性
+<!ELEMENT databaseIdProvider
+属性(
+	type 
+)
+子标签(
+	property 数据库厂商和标识和名称 
+    	{
+    	name = 数据库厂商标识
+    	value= 给标识起一个比较好听的名字， jdk 中的getDatabaseProductName就是获取该名称
+    	}
+)
+>
+```
+
+
+
 ## mappers
 
-```xml
-<mappers
-	映射器， 加载映射文件，指的是每个 dao 独立的配置文件  
-     加载映射关系
+```dtd
+<!ELEMENT mappers
+含义（
+   映射器， 加载映射文件，指的是每个 dao 接口独立的配置文件  
+   就是每个 dao 接口的实例的配置，用来指明接口实例再什么地方
+）    	  
 子标签(
-	mapper
-         
+	mapper	
+    	每个 dao 接口的实例(对应的 xml 文件)
 	package 
          指定接口所在的包
 )>
@@ -832,28 +951,22 @@ public class ExamplePlugin implements Interceptor {
 子标签(
  )
 属性（
-	resourcese       UserDao.xml
+url	可以从磁盘或者网络路径引用
+resourcese       UserDao.xml , 类路径下找 sql 映射文件
+class	
+    直接引用接口的全类名，
+    方式一：此时 xml 实例文件和 dao 接口应该放在同一个包/文件夹中, 且需要文件名一致
+	方式二：支持注解，不用写 mapper.xml 实例文件
         
 ）>    
-```
 
-```xml
-<configuration>
-    <environments default="development">
-        <environment id="development">        
-            <transactionManager type="JDBC"/>
-            <dataSource type="POOLED">
-                <property name="driver" value="com.mysql.jdbc.Driver"/>
-                <property name="url" value="jdbc:mysql:///test"/>
-                <property name="username" value="root"/>
-                <property name="password" value="root"/>
-            </dataSource>
-        </environment>
-    </environments>
-    <mappers> 
-        <mapper resource="com/itheima/mapper/UserMapper.xml"/> 
-    </mappers>
-</configuration>
+<!ELEMENT package
+介绍(
+	批量注册 mapper.xml 实例文件
+)
+属性(
+	name : dao 接口们所在的包名
+)>
 ```
 
 
@@ -910,71 +1023,54 @@ public class ExamplePlugin implements Interceptor {
     
 ```
 
-## select
+## cache
 
-```java
-<select
-子标签(
-	if
-    where
-    
-)    
-属性(    
-    // id 
-        唯一的名称，对应dao中mapper的接口名称！！！！
-    	文件中查询语句的标识，方法的名称
-    // paramterType 
-       定义传入的参数类型
-    // resultType 
-        返回数据类型对应实体类
-    // resultMap 
-        外部 resultMap 的命名引用, 手动指定字段和实体属性的映射关系
-    	结果集的映射是 MyBatis 最强大的特性，对其有一个很好的理解的话，许多复杂映射的情形都能迎刃而解。
-    	使用 resultMap 或 resultType，但不能同时使用
-    flushCache 
-        将其设置为 true，任何时候只要语句被调用，都会导致本地缓存和二级缓存都会被清空，默认值：false
-    useCache 
-        将其设置为 true，将会导致本条语句的结果被二级缓存，默认值：对 select 元素为 true
-    timeout 
-        这个设置是在抛出异常之前，驱动程序等待数据库返回请求结果的秒数。默认值为 unset（依赖驱动）
-    fetchSize 
-        这是尝试影响驱动程序每次批量返回的结果行数和这个设置值相等。默认值为 unset（依赖驱动）。
-    statementType STATEMENT，PREPARED 或 CALLABLE 的一个。
-    	这会让 MyBatis 分别使用 Statement，PreparedStatement 或 CallableStatement，默认值：PREPARED。
-    resultSetType FORWARD_ONLY，SCROLL_SENSITIVE 或 SCROLL_INSENSITIVE 
-    		中的一个，默认值为 unset （依赖驱动）。
-    databaseId 
-    	如果配置了 databaseIdProvider，MyBatis 会加载所有的不带 databaseId 或匹配当前 databaseId 的语句；如果带或者不带的语句都有，则不带的会被忽略。
-    resultOrdered 
-    	这个设置仅针对嵌套结果 select 语句适用：如果为true，就是假设包含了嵌套结果集或是分组了，这样的话当返回一个主结果行的时候，就不会发生有对前面结果集的引用的情况。这就使得在获取嵌套的结果集的时候不至导致内存不够用。默认值：false。
-    resultSets 
-    	这个设置仅对多结果集的情况适用，它将列出语句执行后返回的结果集并每个结果集给一个名称，名称是逗号分隔的。
+```dtd
+<!ELEMENT cache
+属性（
+eviction=“FIFO”：缓存回收策略：
+	LRU – 最近最少使用的：移除最长时间不被使用的对象。
+	FIFO – 先进先出：按对象进入缓存的顺序来移除它们。
+	SOFT – 软引用：移除基于垃圾回收器状态和软引用规则的对象。
+	WEAK – 弱引用：更积极地移除基于垃圾收集器状态和弱引用规则的对象。
+	默认的是 LRU。 
+flushInterval：刷新间隔，单位毫秒
+	默认情况是不设置，也就是没有刷新间隔，缓存仅仅调用语句时刷新
+size：引用数目，正整数
+	代表缓存最多可以存储多少个对象，太大容易导致内存溢出
+readOnly：只读，true/false
+    true：只读缓存；会给所有调用者返回缓存对象的相同实例。
+    因此这些对象不能被修改。这提供了很重要的性能优势。
+    false：读写缓存；会返回缓存对象的拷贝（通过序列化）。
+    这会慢一些，但是安全，因此默认是 false。    
 
-)>   
+    ）    
+>
 ```
+
+
 
 ## update、delete、insert
 
-```xml
-<insert
+```dtd
+<!ELEMENT insert
+字标签（
+	selectKey    
+）    
 属性(      
     id 
-        <--
-            唯一的名称，对应dao中mapper的接口名称
-            文件中查询语句所在的标识
-        -->
+    databaseId 
     parameterType 
-        <--
-           将要传入语句的参数的完全限定类名或别名。
-            这个属性是可选的，因为 MyBatis 可以通过 TypeHandler 推断出具体传入语句的参数，默认值为 unset。
-         -->
-    flushCache 将其设置为 true，任何时候只要语句被调用，都会导致本地缓存和二级缓存都会被清空，默认值：true（对应插入、更新和删除语句）。
-    timeout 这个设置是在抛出异常之前，驱动程序等待数据库返回请求结果的秒数。默认值为 unset（依赖驱动）。
-    statementType STATEMENT，PREPARED 或 CALLABLE 的一个。这会让 MyBatis 分别使用 Statement，PreparedStatement 或 CallableStatement，默认值：PREPARED。
-    useGeneratedKeys（仅对 insert 和 update 有用）这会令 MyBatis 使用 JDBC 的 getGeneratedKeys 方法来取出由数据库内部生成的主键（比如：像 MySQL 和 SQL Server这样的关系数据库管理系统的自动递增字段, oracle使用序列是不支持的，通过selectKey可以返回主键），默认值：false。
-    keyProperty （仅对 insert 和 update 有用）唯一标记一个属性，MyBatis 会通过 getGeneratedKeys 的返回值或者通过 insert 语句的 selectKey子元素设置它的键值，默认：unset。如果希望得到多个生成的列，也可以是逗号分隔的属性名称列表。
-    keyColumn（仅对 insert 和 update 有用）通过生成的键值设置表中的列名，这个设置仅在某些数据库（像PostgreSQL）是必须的，当主键列不是表中的第一列的时候需要设置。如果希望得到多个生成的列，也可以是逗号分隔的属性名称列表。
-    databaseId 如果配置了 databaseIdProvider，MyBatis 会加载所有的不带 databaseId 或匹配当前 databaseId 的语句；如果带或者不带的语句都有，则不带的会被忽略。
+    
+    useGeneratedKeys
+    keyProperty 
+	selectkey
+
+    flushCache
+    timeout 
+    statementType 
+
+    keyColumn
 
 )>   
             
@@ -1000,47 +1096,188 @@ public class ExamplePlugin implements Interceptor {
             
 ```
 
+### 属性 
+
+```dtd
+   
+    id 
+    	对应执行的 dao 接口中的方法名， 是唯一标识
+        文件中查询语句所在的标识
+    databaseId 
+    	指定 CRUD　属于哪一个数据库，
+    	如果配置了 databaseIdProvider，MyBatis 会加载所有的不带 databaseId 或匹配当前 databaseId 的语句；
+    	如果带或者不带的语句都有，则不带的会被忽略。
+
+    parameterType 
+        将要传入语句的参数的完全限定类名或别名。
+        这个属性是可选的，默认值为 unset
+    	因为 MyBatis 可以通过 TypeHandler 推断出具体传入语句的参数
+    useGeneratedKeys
+	   <!-- 获取自增主键的方法，只有个自增列-->
+       仅对 insert 和 update 有用, 默认值：false。
+       这会令 MyBatis 使用 JDBC 的 getGeneratedKeys 方法来取出由数据库内部生成的主键
+       比如：
+    		MySQL 和 SQL Server这样的关系数据库管理系统的自动递增字段, 
+    		oracle使用序列是不支持的，通过 selectKey 可以返回主键
+    keyProperty 
+    	仅对 insert 和 update 有用）唯一标记一个属性，默认：unset
+    	MyBatis 会设置其键值为
+			<!-- 将 userGeneratedKeys 将查询到的列(属性值)赋值给 javaBean 的对应属性 -->
+    		getGeneratedKeys 的返回值
+    		insert 语句的 selectKey子元素，
+    	如果希望得到多个生成的列，也可以是逗号分隔的属性名称列表。
+	selectkey
+	<!-- 查询主键，主要用于非自增主键 -->
+    flushCache 将其设置为 true，任何时候只要语句被调用，都会导致本地缓存和二级缓存都会被清空，默认值：true（对应插入、更新和删除语句）。
+    timeout 这个设置是在抛出异常之前，驱动程序等待数据库返回请求结果的秒数。默认值为 unset（依赖驱动）。
+    statementType 
+    	STATEMENT，PREPARED 或 CALLABLE 的一个。
+    	这会让 MyBatis 分别使用 Statement，PreparedStatement 或 CallableStatement，
+    	默认值：PREPARED。
+    keyColumn（仅对 insert 和 update 有用）通过生成的键值设置表中的列名，这个设置仅在某些数据库（像PostgreSQL）是必须的，当主键列不是表中的第一列的时候需要设置。如果希望得到多个生成的列，也可以是逗号分隔的属性名称列表。
+
+)>   
+            
+```
+
+### 字标签
+
+#### selectKey
+
+```dtd
+<!ELEMENT selectKey
+介绍（
+	用于 insert
+）    
+属性(
+	order="EFORE"
+    	before  在核心 sql 语句之前先运行一个查询 sql
+    	after	
+   keyProperty=
+    	将查询到的列(属性值)赋值给 javaBean 的哪个属性
+)>
+```
+
+
+
+## select
+
+```java
+<select
+子标签(
+	if
+    where
+    
+)    
+  
+```
+
+### 属性
+
+```java
+属性(    
+    // id 
+        唯一的名称，对应dao中mapper的接口名称！！！！
+    	文件中查询语句的标识，方法的名称
+    // paramterType 
+       定义传入的参数类型
+    // resultType 
+    	返回值类型
+    	多条记录封装 list ：resultType = 集合里面元素的类型
+        	返回数据类型对应实体类
+    	单条记录封装 map : resultType = map
+    		结果集 map 中，默认使用列名作为 key, 值作为 value
+    	多条记录封装 map :  resultType = 集合里面元素的类型
+    		添加注解 @mapKey("id") 把查询记录的 id 值作为 key 封装
+    		结果集 map 中， 使用主键作为 key, value 值为封装好的对象
+    	返回的是集合的话，写的是集合里面元素的类型
+    // resultMap 
+		自定义map 结果集映射， 自定义封装规则
+    		resultMap = resultMap 标签指定的 id  值
+    	详情见 result 标签    	 	
+    	使用 resultMap 或 resultType，但不能同时使用
+    flushCache 
+        将其设置为 true，任何时候只要语句被调用，都会导致本地缓存和二级缓存都会被清空，默认值：false
+    useCache 
+        将其设置为 true，将会导致本条语句的结果被二级缓存，默认值：对 select 元素为 true
+    timeout 
+        这个设置是在抛出异常之前，驱动程序等待数据库返回请求结果的秒数。默认值为 unset（依赖驱动）
+    fetchSize 
+        这是尝试影响驱动程序每次批量返回的结果行数和这个设置值相等。默认值为 unset（依赖驱动）。
+    statementType STATEMENT，PREPARED 或 CALLABLE 的一个。
+    	这会让 MyBatis 分别使用 Statement，PreparedStatement 或 CallableStatement，默认值：PREPARED。
+    resultSetType FORWARD_ONLY，SCROLL_SENSITIVE 或 SCROLL_INSENSITIVE 
+    		中的一个，默认值为 unset （依赖驱动）。
+    // databaseId 
+    	如果配置了 databaseIdProvider，
+    	MyBatis 会加载所有的不带 databaseId 或匹配当前 databaseId 的语句；
+    	如果带或者不带的语句都有，则不带的会被忽略。
+    resultOrdered 
+    	这个设置仅针对嵌套结果 select 语句适用：如果为true，就是假设包含了嵌套结果集或是分组了，这样的话当返回一个主结果行的时候，就不会发生有对前面结果集的引用的情况。这就使得在获取嵌套的结果集的时候不至导致内存不够用。默认值：false。
+    resultSets 
+    	这个设置仅对多结果集的情况适用，它将列出语句执行后返回的结果集并每个结果集给一个名称，名称是逗号分隔的。
+
+)> 
+```
+
+
+
 ## resultMap
 
 ### 介绍
 
-```xml
+```dtd
+介绍
+	自定义结果集
+	对于多表联合查询的，直接使用自定义结果集 
+mybatis 自动封装
+    1. 按照列名、属性名 -- 对应的规则(不区分大小写)
+    2. 如果不一一对应
+        1. 开启驼峰命名法（a_b 映射 aB）
+        2. 起别名
+
 介绍
 	数据表对应关系
 	手动指定指定字段与实体属性的映射关系
 多表操作
-	一对一
-	一对多
-	多对多
-	多对一
+	// 钥匙和锁
+	一对一: 从钥匙的角度看： 一把钥匙只能开一把锁
+	一对多： 从锁的角度看： 一把锁可以有多把钥匙
+		外键在多的表： 多个人记忆一个人方便
+	多对多： 学生和老师：不管从谁的角度看，都是多对多的
+		中间表存储对应关系
+	多对一： 从钥匙角度看： 多把钥匙可以开一把锁
 
 <!ELEMENT resultMap
+介绍(
+	自定义结果集
+)  
 子元素(
     constructor 
 		<!-- 
 			用于在实例化类时，注入结果到构造方法中 
  		-->
-    id		<!-- 用于表示哪个列是主键 -->
+    id		<!-- 唯一标识，支出主键列 -->
     result   <!-- 注入到字段或JavaBean属性的普通结果 -->
-    association  <!-- 用于一对一关联 -->
-    collection    <!-- 用于一对多、多对多关联 -->
-    discriminator   <!-- 使用结果值来决定使用哪个结果映射 -->
+    association  
+    	用于一对一关联， 表示联合了一个对象
+    collection    
+    	用于一对多、多对多关联 
+    discriminator  
+    	使用结果值来决定使用哪个结果映射
 )
 属性(
-	id	像，结果映射
-    type	原像
-	autoMapping
-)-->
-    
-属性
 id
+    结果集的名称
 	当前命名空间中的一个唯一标识，用于标识一个结果映射
 type
-	类的完全限定名, 或者一个类型别名（关于内置的类型别名，可以参考上面的表格）
+    指定为哪个 java 类自定义封装规则，值为 类全类型名
+
 autoMapping   
 	如果设置这个属性，MyBatis 将会为本结果映射开启或者关闭自动映射。 
-	这个属性会覆盖全局的属性 autoMappingBehavior。默认值：未设置（unset）。 
-
+	这个属性会覆盖全局的属性 autoMappingBehavior。默认值：未设置（unset）
+)>
+    
 
     <resultMap id="" type="">
         <constructor>
@@ -1061,125 +1298,32 @@ autoMapping
 
 ### 子元素
 
-#### constructor 
-
-```xml
-<!ELEMENT constructor 
-子元素(
-	idArg	 <!-- ID参数，结果为ID -->
-    arg	<!-- 注入到构造方法的一个普通结果 -->
-)>
-```
-
-
-
-
-
-
-
-#### association
-
-```JAVA
-介绍
-    用于一对一查询
-场景
-    一个用户有多个订单，但是一个订单只属于一个用户
-	需求： 查询一个订单，同时查询出订单所属用户（order --> user）
-    
-语法
-<!ELEMENT association
-子元素（
-    id	// 同下
-    result  // 同下
-    collection  // 同下
-）
-属性（
-	property
-    javaType
-    jdbcType
-    typeHandler
-）>
-属性
-    property 
-    	// property = user （Order 类的属性： private User user）
-    	当前实体中的属性名称
-    	JavaBean 存在相应字段则使用，不存在则 MyBatis 将会寻找给定名称的字段。 
-    	复杂属性导航：使用点式分割， address.street.number
-    
-    javaType 
-    	// javaType = User; （Order 类的属性： private User user）
-		当前实体中的属性的类型：类的完全限定名，或类型别名（注意内置类型别名）
-    	MyBatis 通常可以推断 Java Bean 类型，但是 HashMap 需要明确指定这个属性
-    
-    jdbcType
-    	// jdbcType = 
-    
-    	JDBC 类型，所支持的 JDBC 类型参见这个表格之前的“支持的 JDBC 类型”。 
-    	只需要在可能执行插入、更新和删除的且允许空值的列上指定 JDBC 类型。
-    	这是 JDBC 的要求而非 MyBatis 的要求。如果你直接面向 JDBC 编程，你需要对可能存在空值的列指定这个类型。
-    typeHandler 	
-    
-    
-    	我们在前面讨论过默认的类型处理器。
-    	使用这个属性，你可以覆盖默认的类型处理器。 
-    	这个属性值是一个类型处理器实现类的完全限定名，或者是类型别名
-
-```
-
-#### collection
-
-```java
-介绍
-    合元素和关联元素几乎是一样的
-    
-
-<!ELEMENT coolection
-子元素（
-	id		// 同下
-    result   // 同下
-	
-）
-属性（
-	property="posts" ofType="domain.blog.Post"
-）>
-    
-属性
-property 
-    // property="posts" （private List<Post> posts;）
-    集合的名称
-ofType	
-    // ofType="domain.blog.Post" private List<Post> posts;）
-   当前集合的数据类型
-```
-
-
-
 #### id & result
 
-```java
+```dtd
 介绍
 	id 和 result 元素都将一个列的值映射到一个简单数据类型（String, int, double, Date 等）的属性或字段
 	id 元素对应的属性会被标记为对象的标识符，在比较对象实例时使用，提高性能(进行缓存和嵌套结果映射（也就是连接映射）的时候)
 
 <!ELEMENT id result
+介绍(
+	id 主键列
+    result 普通列
+)    
 属性(
     column
+        数据库列名/列别名， id(主键类名)  result(列名)
+        一般情况下，这和传递给 resultSet.getString(columnName) 方法的参数一样。
 	property
+    	类(实体)属性名，结果类的字段/属性
+		指定具体的 java 类(结果类)的那个属性，该属性封装 column 指定的那一列的数据
+    	java bean 有这个属性字段，则使用，否则 MyBatis 将会寻找给定名称的字段（field）
     javaType
     jdbcType
     typeHandler
 )>
 
-属性
-property 
-    // 实体的属性名称
-	映射到列结果的字段或属性。
-	如果 JavaBean 有这个名字的属性（property），会先使用该属性。否则 MyBatis 将会寻找给定名称的字段（field）。  
-	比如，你可以这样映射一些简单的东西：“username”，或者映射到一些复杂的东西上：“address.street.number”。
-column 	
-    // 数据表字段名称
-	数据库中的列名，或者是列的别名。
-    一般情况下，这和传递给 resultSet.getString(columnName) 方法的参数一样。
+
 javaType 	
     一个 Java 类的全限定名，或一个类型别名（关于内置的类型别名，可以参考上面的表格）。 
     如果你映射到一个 JavaBean，MyBatis 通常可以推断类型。
@@ -1194,6 +1338,111 @@ typeHandler
     使用这个属性，你可以覆盖默认的类型处理器。 
     这个属性值是一个类型处理器实现类的全限定名，或者是类型别名。
 ```
+
+#### constructor 
+
+```dtd
+<!ELEMENT constructor 
+子元素(
+	idArg	 <!-- ID参数，结果为ID -->
+     arg	<!-- 注入到构造方法的一个普通结果 -->
+)>
+```
+
+#### association
+
+```dtd
+介绍
+    用于一对一查询，表示联合了一个对象 A
+场景
+    一个用户有多个订单，但是一个订单只属于一个用户
+	需求： 查询一个订单，同时查询出订单所属用户（order --> user）
+    
+语法
+<!ELEMENT association
+介绍(
+	内部标签，表示该属性的内部属性字段的封装规则
+)    
+子元素（
+    id	// 主键列
+    result  // 普通列
+    collection  // 同下
+）
+属性（
+property 
+    // property = user （Order 类的属性： private User user）
+     属性的名称(当前联合对象 A 的名称)，复杂属性可使用级联操作（点式分割， address.street.number）
+    JavaBean 存在相应字段则使用，不存在则 MyBatis 将会寻找给定名称的字段。 
+
+javaType 
+    // javaType = User; （Order 类的属性： private User user）
+    属性的类型(当前联合对象 A 的类型)： 全类名(类型别名)
+    MyBatis 通常可以推断 Java Bean 类型，但是 HashMap 需要明确指定这个属性
+
+jdbcType
+    // jdbcType = 
+    JDBC 类型，所支持的 JDBC 类型参见这个表格之前的“支持的 JDBC 类型”。 
+    只需要在可能执行插入、更新和删除的且允许空值的列上指定 JDBC 类型。
+    这是 JDBC 的要求而非 MyBatis 的要求。如果你直接面向 JDBC 编程，你需要对可能存在空值的列指定这个类型。
+
+typeHandler 	
+    我们在前面讨论过默认的类型处理器。
+    使用这个属性，你可以覆盖默认的类型处理器。 
+    这个属性值是一个类型处理器实现类的完全限定名，或者是类型别名
+    
+select
+    分步查询，
+    值为外部 select 语句的 id 值，
+    在执行 association 标签的同时，会自动调动外部的 select 语句
+    
+column 
+    指定将哪一列的值传递给 select, 作为其方法执行的参数
+    column = {取值用的 key = 需要的那一列的列名，key2=列名，..}
+）>
+
+```
+
+#### collection
+
+```dtd
+介绍
+    合元素和关联元素几乎是一样的
+    用来处理一对多、多对多
+
+<!ELEMENT coolection
+介绍（
+    定义集合元素的封装
+    标签体中指定集合中元素的封装规则
+}    
+子元素（
+	id		// 主列名
+    result   // 普通列名
+    association  // 对象封装	
+）
+属性（
+property 
+    // property="posts" （private List<Post> posts;）
+    集合的名称，哪个属性是集合属性，属性名
+
+javaType
+	指定对象类型，只是在 association 标签中
+
+ofType	
+    // ofType="domain.blog.Post" private List<Post> posts;）
+   当前集合中元素的类型，全类名
+
+select
+    分步查询，
+    值为外部 select 语句的 id 值，
+    在执行 association 标签的同时，会自动调动外部的 select 语句
+
+column
+	给 select 语句执行的方法进行传参
+     column = {取值用的 key = 需要的那一列的列名，key2=列名，..}
+）
+```
+
+
 
 #### discriminator
 
@@ -1213,70 +1462,197 @@ typeHandler
 
 ## ---------------------------------
 
+## 判断
 
+```java
+OGNL（ Object Graph Navigation Language ）
+	对象图导航语言
+	一种表达式语言，通过它可以非常方便的来操作对象属性。
+mybatis 中可以用于判断的
+	1. 用传入的参数做判断
+	2. _parameter
+		// 代表传入的参数
+		1. 传入单个参数， 代表这个参数
+    	2. 传入多个参数， 代表多个参数集合起来的 map
+	3. _databaseId
+    	// 代表当前环境 ，配置的情况下，可以获取数据库
+    	<if test="_databaseId == 'mysql'"> ... </if>
+    	<if test="_databaseId == 'oracle'"></if>
+```
 
-```xml
-介绍
-	基本都是用来判断值是否为空，注意Integer的判断，mybatis会默认把0变成 ‘’
-语法格式
+![image-20210404203649295](image-20210404203649295.png)
+
+## if
+
+```dtd
 <!ELEMENT if
-属性(
-	test
-		判断条件，
-)>
+介绍(
+	满足条件就拼接上 if 标签中的语句，不满足则不拼接
+    注意语句拼接上以后是否正确
+)    
+属性（
+	test=""
+		if 判断的条件, 可以直接拿 javaBean 的属性进行判断
+）>
+
+语法例子
+// 对于 
+	and &&(需要进行转义，html 中转义)
+	or  ||(需要进行转义，html 中转义) 
+<if test = "id != 0 and userName!=null"></if>
+
+<select id="findByCondition" parameterType="user" resultType="user">
+    select * from User
+    <where>
+	    <!-- 传过来的 pojo 的属性中 id 不是 0 -->
+        <if test="id!=0">
+		   <!--
+				id 数据库中列
+				#{id} 传过来的 pojo 属性值
+			-->
+            and id = #{id}
+        </if>
+        <if test="userName != null">
+            and user_name = #{userName}
+        </if>
+    </where>
+</select>
+
+注意
+	基本都是用来判断值是否为空，注意Integer的判断，mybatis会默认把0变成 ‘’
 例子
     <!-- 如果是Integer类型的需要把and后面去掉或是加上or-->
     <if test="id != null"></if>
     <if test="item != null and item != '' or item == 0"></if>
 ```
 
+
+
 ## where
 
 ```xml
 <!ELEMENT where
+介绍(
+	where 元素只会在子元素返回任何内容的情况下才插入 “WHERE” 子句。
+	若子句的开头为 “AND” 或 “OR”，where 元素也会将它们去除。
+)
 子元素(
 	foreach
 	
 )>
 ```
 
+## trim
+
+```dtd
+<!ELEMEMT trim
+注意（
+ 	直接使用 where 就行，不用使用这个标签了   
+ ）    
+属性(
+prefix="where"
+    为下面的 sql 整体添加一个前缀
+prefixOverrides = "and"
+    取出整体字符串前面多余的字符
+suffix
+    为下面的 sql 整体添加一个后缀
+suffixOverrides = "and"
+    后面哪个多了，可以去点
+    
+    )>
+<trim></trim
+```
+
 
 
 ## foreach
 
-```xml
-<! foreach 
+```xml-dtd
+<!ELEMENT foreach 
+含义(
+    
+)    
 属性(
     collection 
-		<--
+		可以直接在参数中取其别名  @Param("ids")List<Integer> ids
          循环的集合。代表要遍历的集合元素，注意编写时不要写#{}
-		传的是集合为list，数组为array, 如果是map为java.util.HashMap
-        -->
+		传的是集合为list，数组为array, 如果是 map 为 java.util.HashMap
+
     item 
-        <--
-		循环的key, 代表遍历集合的每个元素，生成的变量名
-        -->
+		每次遍历的元素起一个变量名，方便引用
     index
-		循环的下表顺序
+		如果遍历的是一个 List， 
+			index 指定的变量保存了当前索引
+			item 保存了值
+		如果遍历的是一个 map， 
+			index 指定的变量保存了当前遍历的元素的 key
+			item  保存了值
     open 
-		<--循环的开头,代表语句的开始部分-->
+		以什么开始
     close 
-		<--循环结束,代表结束部分-->
+		以什么结束
     separator
-        <--
-		循环的分隔符
-		-->
+		每次遍历的元素的分隔符
 )>  
             
 语法例子
 <select id="findByIds" parameterType="list" resultType="user">
     select * from User
     <where>
-        <foreach collection="array" open="id in(" close=")" item="id" separator=",">
+        <foreach collection="array" open="(" close=")" item="id" separator=",">
             #{id}
         </foreach>
     </where>
 </select>           
+```
+
+
+
+## choose
+
+```dtd
+<!--public List<Teacher> getTeacherByConditionChoose(Teacher teacher) -->
+<select id= "getTeacherByConditionChoose" resultMap="teacherMap">
+select * from t_teacher
+<!-- 相当于 switch ，一个执行，其余的都不执行-->
+<where>
+    <choose>
+        <when test= "id!=nulL">
+            id=#{id}
+        </when>
+        <when test= "name!=null and !name.equals(&quot;&quot;)">
+            teacherName= # name}
+        </when>
+        <when test= "birthdate !=null">
+            birth_ date = #{birth}
+        </when>
+        <otherwise>
+            1 = 1
+        </otherwise>
+	</choose>
+</where>
+
+```
+
+## set
+
+```dtd
+
+
+<!--public int updateTeacher(Teacher teacher) -->
+<update id= "updateTeacher" resultMap="teacherMap">
+    update t_teacher 
+    <set>
+        <if test= "name!=null and !name.equals(&quot;&quot;)">
+            teacherName= #{name}
+        </if>
+        <if test= "birthdate !=null">
+            birth_ date = #{birth}
+        </if>
+    </set>
+
+</where>
+
 ```
 
 
@@ -1292,4 +1668,32 @@ typeHandler
 
 
 
+
+## sql
+
+```xml
+介绍
+	抽取可重用的 sql
+	使用时用 include 引用即可，最终达到 sql 重用的目的
+
+<!--抽取sql片段简化编写-->
+<sql id="selectUser"> select * from User</sql>
+
+// 复用
+<select id="findById" parameterType="int" resultType="user">
+    <include refid="selectUser"></include> where id=#{id}
+</select>
+
+// 复用
+<select id="findByIds" parameterType="list" resultType="user">
+    <include refid="selectUser"></include>
+    <where>
+        <foreach collection="array" open="id in(" close=")" item="id" separator=",">
+            #{id}
+        </foreach>
+    </where>
+</select>
+```
+
+# 
 
