@@ -1,8 +1,15 @@
-## 介绍
+## git 配置
 
 ```java
 安装好IntelliJ IDEA后，
 如果Git安装在默认路径下，那么idea会自动找到git的位置，如果更改了Git的安装位置则需要手动配置下Git的路径。
+    
+    
+File–>Setting->Version Control–>Git–>Path to Git executable
+    选择你的git安装后的git.exe文件，然后点击Tes   
+    
+github 
+    在相同的界面下配置
 ```
 
 ## 项目配置

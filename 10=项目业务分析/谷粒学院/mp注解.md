@@ -86,7 +86,7 @@ public enum IdType {
         SqlCondition.LIKE：表示该属性可以模糊搜索
 	fill 
         = FieldFill.INSERT ：注解填充字段 ，生成器策略部分也可以配置！
-        // FieldFill 参看 该注解
+        // FieldFill 参看 该注解, 也就是什么情况下填充该字段
 	strategy	字段验证	        
 }    
 
@@ -119,6 +119,17 @@ public enum FieldFill {
 ## @TableLogic
 
 ```java
+@TableLogin(
+含义：{
+    在字段上加上这个注解
+    再执行BaseMapper的删除方法时，删除方法会变成修改
+}  
+属性：{
+    value 默认的值
+    delval 删除后修改的新的值
+}}    
+)
+
 
 ```
 

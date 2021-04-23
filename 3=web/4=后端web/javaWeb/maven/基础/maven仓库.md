@@ -38,13 +38,22 @@
 2. 编译：将 Java 源程序编译为字节码文件。
 3. 测试：针对项目中的关键点进行测试，确保项目在迭代开发过程中关键点的正确性。
 4. 报告：在每一次测试后以标准的格式记录和展示测试结果。
-5. 打包：将一个包含诸多文件的工程封装为一个压缩文件用于安装或部署。Java 工程对应 jar 包，Web
-工程对应 war 包。
+5. 打包：
+    将一个包含诸多文件的工程封装为一个压缩文件用于安装或部署。
+    Java 工程对应 jar 包，Web工程对应 war 包。
 6. 安装：在 Maven 环境下特指将打包的结果——jar 包或 war 包安装到本地仓库中。
 7.部署：将打包的结果部署到远程仓库或将 war 包部署到服务器上运行。
 ```
 
 
+
+## 生命周期
+
+### 介绍
+
+```java
+
+```
 
 
 
@@ -72,6 +81,15 @@
     // 参看 maven jar 包导入顺序
 ```
 
+### 内容
+
+```java
+[1]Maven 的插件
+[2]我们自己开发的项目的模块
+[3]第三方框架或工具的 jar 包
+※不管是什么样的 jar 包，在仓库中都是按照坐标生成目录结构，所以可以通过统一的方式查询或依赖。
+```
+
 
 
 ### 本地仓库
@@ -79,6 +97,7 @@
 ```xml
 默认
     认被创建在 %USER_HOME% 目录下。
+	电脑上部署的仓库目录
 修改默认位置
     在 %M2_HOME%\conf 目录中的 Maven 的 settings.xml 文件中定义另一个路径。
     运行 Maven 命令，Maven 将下载依赖的文件到你指定的路径中
@@ -144,6 +163,8 @@
 	在maven的settings.xml文件中配置下载模板
 	在maven的settings.xml文件中配置激活下载模板
 ```
+
+![image-20210416113658546](image-20210416113658546.png)
 
 ##### 发布
 
@@ -254,90 +275,6 @@
 ```
 
 
-
-## mave 依赖
-
-### 规范
-
-```java
-按照 
-    project 标签的顺序来
-```
-
-### 依赖范围
-
-| **依赖范围** | **对编译classpath有效** | **对测试classpath有效** | **对运行时classpath有效** | **例子**                    |
-| ------------ | ----------------------- | ----------------------- | ------------------------- | --------------------------- |
-| compile      | Y                       | Y                       | Y                         | spring-core                 |
-| test         | -                       | Y                       | -                         | Junit                       |
-| provided     | Y                       | Y                       | -                         | servlet-api                 |
-| runtime      | -                       | Y                       | Y                         | JDBC驱动                    |
-| system       | Y                       | Y                       | -                         | 本地的，maven仓库之外的类库 |
-
-
-
-### 依赖传递
-
-```java
-介绍
-    在maven中，依赖是可以传递的
-例子
-    三个项目，分别是项目A，项目B以及项目C。假设C依赖B，B依赖A， 则 C 以来 A
-```
-
-### 依赖冲突
-
-```java
-介绍
-    pring-webmvc 依赖 spirng-beans-4.2.4，spring-aop 依赖 spring-beans-5.0.2，
-    但是发现 spirng-beans-4.2.4 加入到了工程中， 加入的并不是 spring-beans-5.0.2，这就造成了依赖冲突
-```
-
-### 冲突解决
-
-```java
-方法
-    1. 使用maven提供的依赖调解原则 
-        第一声明者优先原则
-        路径近者优先原则
-    2. 排除依赖
-    3. 锁定版本 
-
-// 第一声明者优先原则
-    在 pom 文件中定义依赖，以先声明的依赖为准。
-    其实就是根据坐标导入的顺序来确定最终使用哪个传递过来的依赖。
-// 路径近者优先原则
-    在 pom 文件定义依赖，以路径近者为准, 
-	即手动引入你想引入的版本，
-// 排除依赖(有时候使用)
-	可以使用exclusions标签将传递过来的依赖排除出去。
-	<exclusions>
-    	<exclusion>
-        	具体需要排除的标签
-        </exclusion>
-    </exclusions>
-// 版本锁定(重点使用)        
-	直接锁定版本的方法确定依赖jar包的版本，
-    版本锁定后则不考虑依赖的声明顺序或依赖的路径，以锁定的版本为准添加到工程中    
-        
-	// 步骤
-	第一步：在dependencyManagement标签中锁定依赖的版本
-	第二步：在dependencies标签中声明需要导入的maven坐标
-     使用： 在 dependencyManagerment 之外的 dependencies 标签中就不需要使用 version 了
-        
-    <dependencyManagement>
-        <dependencies>
-            <groupId></groupId>
-            <artifacted></artifacted>
-        	<version></version>	// 版本号锁定
-        </dependencies>
-    </dependencyManagement>
-        
-	// 注意
-	pom文件中使用dependencyManagement标签进行依赖jar的版本锁定，并不会真正将jar包导入到项目中，
-     只是对这些jar的版本进行锁定。项目中使用哪些jar包，还需要在dependencies标签中进行声明。
-        
-```
 
 
 

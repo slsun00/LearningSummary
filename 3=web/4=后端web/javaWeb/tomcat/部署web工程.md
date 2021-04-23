@@ -50,24 +50,3 @@ Tom 默认访问的工程和默认访问的资源
 
 
 
-## 打包
-
-```java
-war
-	// 一把发布使用的模式 contextPath,localPath: 在 tomcat/webapp/...
-    先打包成war包，再把该war包部署到服务器上
-    部署文件路径是：tomcat的webapp 目录下
-    
-
-warexplded  
-    // 支持热部署, 一般开发使用方式， contextPath,localPath: 在 项目文件/target 目录
-    war exploded模式是直接把文件夹、jsp页面 、classes等等移到Tomcat 部署文件夹里面，进行加载部署。
-    如果用idea, 它会在${user.home}/.IntelliJIdea/system/tomcat 目录下生成项目的文件夹，
-    里面包含了tomcat的配置，日志等信息。
-区别
-   // 具体的加载位置是由 tomcat catalina.base决定的，这个值是Idea在启动的时候设置的
-    这两种方式得部署方式是不一样的，因此在获取项目的相对路径的时候得到的结果是不一样的。
-```
-
-
-

@@ -71,4 +71,3 @@ spring.datasource.password=123456
 # 要想影响所有实体的配置，可以设置全局主键配置    
 mybatis-plus.global-config.db-config.id-type=auto
 ```
-
