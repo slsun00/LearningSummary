@@ -22,7 +22,9 @@
     	name 严格来说不能有大写
         entry point  程序的入口，相当于 golang 中的 main 
     npm install 包名 --save    // 安装包并添加到依赖中 *****
+    	--save-dev		// 开发依赖
     npm install               // 下载当前项目所依赖的包，更新
+    npm install axios@2.1.x
     npm remove / r 包名 		// 删除包
     
     
