@@ -55,6 +55,11 @@
     // 其他情况都不可以省略，即使没有参数
     let fun = () => console.log("这是匿名函数内部执行的语句")
     let fun = (a,b) => console.log(a,b)
+    /*
+    	https://www.imooc.com/wenda/detail/597768
+    	有人使用 _ 代替没有参数的情况下的 ()
+    	let fun = _ => console.log('匿名函数内部执行的语句')
+    */
     
 3. 参数个数
 	// 支持剩余参数和默认参数

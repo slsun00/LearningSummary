@@ -2,15 +2,19 @@
 
 * 1995年5月23日，Java语言诞生 
 * 1999年6月，SUN公司发布Java的三个版本：
-    * 标准版：J2SE
-    * 企业版：J2EE
-    * 微型版：J2ME
+    * 标准版：J2SE， 开发桌面级应用（现在学的是抛开桌面应用 api 的web需要的基础）
+    * 企业版：J2EE， web 程序开发
+    * 微型版：J2ME， 移动终端（手机 pda）
 * 2004年9月30日 ： J2SE1.5更名为J2SE5.0       
 * 2005年6月，JavaOne大会召开
     * 企业版：J2EE 更名为Java EE, 
     * 标准版：J2SE更名为Java SE，
     * 微型版：J2ME更名为Java ME
 * 2006年11月13日，SUN公司宣布Java全线采纳GNU General Public License Version 2，从而公开了Java的源代码。 
+* 2011   jdk7
+* 2014  jdk8.0
+* 2017 jdk9.0 最大限度实现模块化
+* 2018.3 jdk10.0  版本号 18.3
 
 ## 特点
 

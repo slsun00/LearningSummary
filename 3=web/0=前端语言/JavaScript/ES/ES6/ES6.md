@@ -171,25 +171,7 @@ let obj {
 ### 三点运算符
 
 ```js
-// 扩展运算符，剩余运算符
 
-// rest(可变)参数 ，用来取代 arguments , 但是比 argument 灵活，只能是最后部分形参参数
-// ...value 中的 value 是一个真数组，可以使用 数组的方法
-function foo(a,...value) {
-    console.log(value)		// 这个是最后部分的参数
-    consolse.log(arguments)  // 这个是全部参数
-}
-foo(3,4,5,6)  //  这里 value 就是 数组 4,5,6
-
-
-
-// 扩展运算符
-let arr = [1,6]
-let arr1 = [2,3,4,5]
-arr = [1 , ...arr1 , 6]
-arr.push(...arr1)
-
-console.log(...arr)  // 得到的就是 arr1
 ```
 
 ### 形参默认值

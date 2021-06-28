@@ -300,3 +300,27 @@ git clone https://gitee.com/slsun00/test mytest
 	各版本库之间没有主次之分，是平等的，但是很难做到，所以就一定要在这个团队中固定一个人的版本库 ， 我们需要找一个空闲的单独的稳定的服务器来做这个版本库，大家都从这里更新，向这个提交。这个版本库就是实际工作中的“远程版本库
 ```
 
+## 代理配置
+
+```java
+// 本地电脑使用的公司内网，用了代理，而git没有设置
+    设置全局代理
+    git config --global http.proxy 172.17.18.80:8080
+
+    查看是否成功
+    git config --get http.proxy
+    172.17.18.80:8080
+    
+        
+// 项目单独设置
+只对 github 的 clone 仓库配置：
+        进入 github clone 仓库，运行 git config --local http.proxy 192.168.4.12:8080
+
+        //  .git/config 文件中多了最下面两行
+        [http]
+        proxy = 10.xx.xx.xx:8080
+
+	这也意味着，我们直接按上面改这个配置文件也能达到同样的目的。
+     
+```
+
